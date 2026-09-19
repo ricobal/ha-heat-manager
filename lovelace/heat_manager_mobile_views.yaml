@@ -1,0 +1,2141 @@
+# Heat Manager mobile v2.1 — vues générées
+# Fusionner les éléments de `views` dans le tableau de bord lovelace-mobile après validation.
+# Dépendance : Mushroom déjà installé.
+
+views:
+  -
+    title: "Chauffage"
+    path: "chauffage-v2"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.atlantic_alfea_m_duo_chauffage_circuit_1"
+            primary: "Pompe à chaleur"
+            secondary: "{{ states('climate.atlantic_alfea_m_duo_chauffage_circuit_1') | title }} · consigne {{ states('number.atlantic_alfea_m_duo_temperature_de_consigne') }} °C · ambiance {{ states('sensor.atlantic_alfea_m_duo_temperature_thermostat_z1') }} °C"
+            icon: "mdi:heat-pump"
+            icon_color: "{{ 'deep-orange' if not is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'off') else 'disabled' }}"
+            badge_icon: "{{ 'mdi:fire' if not is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'off') else 'mdi:power' }}"
+            badge_color: "{{ 'deep-orange' if not is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'off') else 'grey' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-pac"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "sensor.atlantic_alfea_m_duo_temperature_ecs"
+            primary: "Eau chaude"
+            secondary: "{{ states('sensor.atlantic_alfea_m_duo_temperature_ecs') }} °C · {{ 'autorisée' if is_state('switch.atlantic_alfea_m_duo_eau_chaude', 'on') else 'désactivée' }} · cycle {{ 'actif' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'inactif' }}"
+            icon: "mdi:water-boiler"
+            icon_color: "{{ 'deep-orange' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'cyan' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-ecs"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "switch.atlantic_alfea_m_duo_absence"
+            primary: "Absence"
+            secondary: "{{ states('sensor.atlantic_alfea_m_duo_absence') }}{% if is_state('switch.atlantic_alfea_m_duo_absence', 'on') %} · jusqu’au {{ states('datetime.atlantic_alfea_m_duo_fin_absence') }}{% endif %}"
+            icon: "mdi:home-export-outline"
+            icon_color: "{{ 'cyan' if is_state('switch.atlantic_alfea_m_duo_absence', 'on') else 'disabled' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-absence"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "binary_sensor.chauffage_demande_chauffage"
+            primary: "Vannes thermostatiques · {{ states('input_select.chauffage_mode_maison') }}"
+            secondary: "{{ state_attr('binary_sensor.chauffage_demande_chauffage', 'nombre_pieces_en_demande') | int(0) }} pièces demandent du chauffage"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if is_state('binary_sensor.chauffage_demande_chauffage', 'on') else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-select-card"
+            entity: "input_select.chauffage_mode_maison"
+            name: "Mode maison"
+            icon: "mdi:home-thermometer-outline"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "binary_sensor.chauffage_demande_chauffage"
+            primary: "Plus forte demande"
+            secondary: "{{ state_attr('binary_sensor.chauffage_demande_chauffage', 'piece_ecart_maximum') }} · {{ state_attr('binary_sensor.chauffage_demande_chauffage', 'ecart_maximum') }} °C sous la consigne"
+            icon: "mdi:chart-line-variant"
+            icon_color: "{{ 'deep-orange' if state_attr('binary_sensor.chauffage_demande_chauffage', 'ecart_maximum') | float(0) > 0.5 else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Zones"
+            subtitle: "Synthèse uniquement · commandes dans chaque pièce"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "sensor.chauffage_zone_parents"
+            primary: "Zone parents"
+            secondary: >-
+              {% set entities = ['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents'] %}
+              {% set ns = namespace(total=0) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {{ ns.total }} sur 3 en demande · {{ states('sensor.chauffage_zone_parents') }} °C
+            icon: "mdi:bed-king-outline"
+            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_zone_parents', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-zone-parents"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "sensor.chauffage_premier_etage"
+            primary: "1er étage"
+            secondary: >-
+              {% set entities = ['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie'] %}
+              {% set ns = namespace(total=0) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {{ ns.total }} sur 7 en demande · {{ states('sensor.chauffage_premier_etage') }} °C
+            icon: "mdi:home-floor-1"
+            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_premier_etage', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "sensor.chauffage_buanderie"
+            primary: "Buanderie"
+            secondary: >-
+              {% set entities = ['climate.radiateur_buanderie'] %}
+              {% set ns = namespace(total=0) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {{ ns.total }} sur 1 en demande · {{ states('sensor.chauffage_buanderie') }} °C
+            icon: "mdi:washing-machine"
+            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_buanderie', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-buanderie"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "sensor.chauffage_sous_sol"
+            primary: "Sous-sol"
+            secondary: >-
+              {% set entities = ['climate.radiateur_atelier', 'climate.radiateur_salle_cine'] %}
+              {% set ns = namespace(total=0) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {{ ns.total }} sur 2 en demande · {{ states('sensor.chauffage_sous_sol') }} °C
+            icon: "mdi:home-floor-negative-1"
+            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_sous_sol', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-zone-sous-sol"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Paramètres"
+            secondary: "Profils maison · durée du boost"
+            icon: "mdi:cog-outline"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-parametres"
+    icon: "mdi:radiator"
+  -
+    title: "Pompe à chaleur"
+    path: "chauffage-pac"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Chauffage"
+            subtitle: "Commandes générales de la pompe à chaleur"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Auto"
+                icon: "mdi:autorenew"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "climate.set_hvac_mode"
+                  data:
+                    hvac_mode: "auto"
+                  target:
+                    entity_id: "climate.atlantic_alfea_m_duo_chauffage_circuit_1"
+                icon_color: "{{ 'cyan' if is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'auto') else 'disabled' }}"
+              -
+                type: "template"
+                content: "Marche"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "climate.set_hvac_mode"
+                  data:
+                    hvac_mode: "heat"
+                  target:
+                    entity_id: "climate.atlantic_alfea_m_duo_chauffage_circuit_1"
+                icon_color: "{{ 'deep-orange' if is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') else 'disabled' }}"
+              -
+                type: "template"
+                content: "Arrêt"
+                icon: "mdi:power"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "climate.set_hvac_mode"
+                  data:
+                    hvac_mode: "off"
+                  target:
+                    entity_id: "climate.atlantic_alfea_m_duo_chauffage_circuit_1"
+                icon_color: "{{ 'grey' if is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'off') else 'disabled' }}"
+          -
+            type: "custom:mushroom-number-card"
+            entity: "number.atlantic_alfea_m_duo_temperature_de_consigne"
+            name: "Consigne générale"
+            icon: "mdi:thermostat"
+            display_mode: "buttons"
+          -
+            type: "horizontal-stack"
+            cards:
+              -
+                type: "custom:mushroom-template-card"
+                entity: "sensor.atlantic_alfea_m_duo_temperature_thermostat_z1"
+                primary: "{{ states('sensor.atlantic_alfea_m_duo_temperature_thermostat_z1') }} °C"
+                secondary: "Thermostat Z1"
+                icon: "mdi:home-thermometer-outline"
+              -
+                type: "custom:mushroom-template-card"
+                entity: "sensor.atlantic_alfea_m_duo_temperature_exterieure"
+                primary: "{{ states('sensor.atlantic_alfea_m_duo_temperature_exterieure') }} °C"
+                secondary: "Extérieur"
+                icon: "mdi:thermometer"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Planning chauffage global"
+            secondary: "Programme utilisé en mode Auto"
+            icon: "mdi:calendar-clock"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-pac-planning"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "État technique"
+            secondary: "Pression et températures"
+            icon: "mdi:gauge"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-pac-technique"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+  -
+    title: "Planning chauffage"
+    path: "chauffage-pac-planning"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning chauffage global"
+            subtitle: "Programme lu depuis l’Alféa M"
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "sensor.atlantic_alfea_m_duo_lundi_programme_chauffage"
+                name: "Lundi"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_mardi_programme_chauffage"
+                name: "Mardi"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_mercredi_programme_chauffage"
+                name: "Mercredi"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_jeudi_programme_chauffage"
+                name: "Jeudi"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_vendredi_programme_chauffage"
+                name: "Vendredi"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_samedi_programme_chauffage"
+                name: "Samedi"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_dimanche_programme_chauffage"
+                name: "Dimanche"
+          -
+            type: "markdown"
+            content: "**Écriture non disponible actuellement.** Les intégrations Alféa M et Cozytouch exposent ces programmes en lecture, sans action d’écriture. Une future version du composant devra ajouter un service dédié avant d’afficher un bouton Enregistrer."
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-pac"
+  -
+    title: "Eau chaude"
+    path: "chauffage-ecs"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Eau chaude"
+            subtitle: "Commandes et état du ballon"
+          -
+            type: "custom:mushroom-entity-card"
+            entity: "switch.atlantic_alfea_m_duo_eau_chaude"
+            name: "Eau chaude autorisée"
+            icon: "mdi:water-boiler"
+            tap_action:
+              action: "toggle"
+          -
+            type: "custom:mushroom-entity-card"
+            entity: "switch.atlantic_alfea_m_duo_boost_ecs"
+            name: "Boost ECS"
+            icon: "mdi:fire"
+            tap_action:
+              action: "toggle"
+          -
+            type: "horizontal-stack"
+            cards:
+              -
+                type: "custom:mushroom-template-card"
+                entity: "sensor.atlantic_alfea_m_duo_temperature_ecs"
+                primary: "{{ states('sensor.atlantic_alfea_m_duo_temperature_ecs') }} °C"
+                secondary: "Température ECS"
+                icon: "mdi:thermometer-water"
+              -
+                type: "custom:mushroom-template-card"
+                entity: "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
+                primary: "{{ 'Actif' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'Inactif' }}"
+                secondary: "Cycle ECS"
+                icon: "mdi:progress-clock"
+                icon_color: "{{ 'deep-orange' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'disabled' }}"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Plages heures creuses"
+            secondary: "00:54–07:24 · 11:54–13:24"
+            icon: "mdi:calendar-clock"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-ecs-planning"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Historique ECS"
+            secondary: "Autorisation et température sur trois jours"
+            icon: "mdi:chart-line"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-ecs-historique"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+  -
+    title: "Planning eau chaude"
+    path: "chauffage-ecs-planning"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning eau chaude"
+            subtitle: "Automatisation des heures creuses"
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "automation.gestion_eau_chaude_alfea_heures_creuses"
+                name: "Gestion ECS automatique"
+          -
+            type: "markdown"
+            content: >-
+              **Nuit :** 00:54 → 07:24  
+              **Midi :** 11:54 → 13:24  
+              Si un cycle est actif à la fin d’une plage, l’automatisation attend sa fin pendant 90 minutes au maximum avant de couper l’autorisation ECS.
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-ecs"
+  -
+    title: "Historique ECS"
+    path: "chauffage-ecs-historique"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Historique ECS"
+            subtitle: "Trois derniers jours"
+          -
+            type: "history-graph"
+            title: "Autorisation et température de l’eau"
+            hours_to_show: 72
+            entities:
+              -
+                entity: "switch.atlantic_alfea_m_duo_eau_chaude"
+                name: "ECS autorisée"
+              -
+                entity: "sensor.atlantic_alfea_m_duo_temperature_ecs"
+                name: "Température ECS"
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              - "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
+              - "sensor.atlantic_alfea_m_duo_consommation_2"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-ecs"
+  -
+    title: "Absence"
+    path: "chauffage-absence"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Absence"
+            subtitle: "Période globale transmise à l’Alféa M"
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "sensor.atlantic_alfea_m_duo_absence"
+                name: "État"
+              -
+                entity: "datetime.atlantic_alfea_m_duo_debut_absence"
+                name: "Début"
+              -
+                entity: "datetime.atlantic_alfea_m_duo_fin_absence"
+                name: "Fin"
+              -
+                entity: "switch.atlantic_alfea_m_duo_absence"
+                name: "Activer l’absence"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+  -
+    title: "État technique"
+    path: "chauffage-pac-technique"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "État technique"
+            subtitle: "Mesures principales de la pompe à chaleur"
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              - "sensor.atlantic_alfea_m_duo_pression_deau"
+              - "sensor.atlantic_alfea_m_duo_temperature_chaudiere"
+              - "sensor.atlantic_alfea_m_duo_temperature_echappement"
+              - "sensor.atlantic_alfea_m_duo_temperature_exterieure"
+              - "sensor.atlantic_alfea_m_duo_temperature_thermostat_z1"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Diagnostic et consommations"
+            secondary: "Connexion, Wi-Fi, compteurs et identification"
+            icon: "mdi:dots-horizontal-circle-outline"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-pac-diagnostic"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-pac"
+  -
+    title: "Diagnostic PAC"
+    path: "chauffage-pac-diagnostic"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Diagnostic PAC"
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              - "binary_sensor.atlantic_alfea_m_duo_connexion_cozytouch"
+              - "sensor.atlantic_alfea_m_duo_signal_wi_fi"
+              - "sensor.atlantic_alfea_m_duo_zone_1"
+              - "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
+              - "binary_sensor.atlantic_alfea_m_duo_mode_boost"
+              - "sensor.atlantic_alfea_m_duo_consommation_1"
+              - "sensor.atlantic_alfea_m_duo_consommation_2"
+              - "sensor.atlantic_alfea_m_duo_modele"
+              - "sensor.atlantic_alfea_m_duo_fuseau_horaire"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-pac-technique"
+  -
+    title: "Paramètres chauffage"
+    path: "chauffage-parametres"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Paramètres chauffage"
+            subtitle: "Valeurs conservées après redémarrage"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Profils maison"
+          -
+            type: "custom:mushroom-number-card"
+            entity: "input_number.chauffage_profil_confort"
+            name: "Confort"
+            icon: "mdi:home-thermometer"
+            display_mode: "buttons"
+          -
+            type: "custom:mushroom-number-card"
+            entity: "input_number.chauffage_profil_nuit"
+            name: "Nuit"
+            icon: "mdi:weather-night"
+            display_mode: "buttons"
+          -
+            type: "custom:mushroom-number-card"
+            entity: "input_number.chauffage_profil_absence"
+            name: "Absence"
+            icon: "mdi:home-export-outline"
+            display_mode: "buttons"
+          -
+            type: "custom:mushroom-number-card"
+            entity: "input_number.chauffage_duree_boost"
+            name: "Durée du boost"
+            icon: "mdi:timer-outline"
+            display_mode: "buttons"
+          -
+            type: "markdown"
+            content: "Les consignes, boosts et plannings des vannes se règlent dans chaque pièce. Les zones restent des synthèses sans commande commune."
+  -
+    title: "Zone parents"
+    path: "chauffage-zone-parents"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Zone parents"
+            subtitle: "Synthèse de la zone · commandes dans chaque pièce"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Pièces"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_parents"
+            primary: "Chambre parents"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_parents', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_parents', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_parents'), states('climate.radiateur_parents')) }}
+            icon: "mdi:bed-king-outline"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_parents', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_parents') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-parents"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_dressing"
+            primary: "Dressing"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_dressing', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_dressing', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_dressing'), states('climate.radiateur_dressing')) }}
+            icon: "mdi:hanger"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_dressing', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_dressing') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-dressing"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_sdb_parents"
+            primary: "SDB parents"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_sdb_parents', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_sdb_parents', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_parents'), states('climate.radiateur_sdb_parents')) }}
+            icon: "mdi:shower-head"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_parents', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_sdb_parents') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-sdb-parents"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+  -
+    title: "1er étage"
+    path: "chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "1er étage"
+            subtitle: "Synthèse de la zone · commandes dans chaque pièce"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Pièces"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_chambre_julie"
+            primary: "Chambre Julie"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_chambre_julie', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_chambre_julie', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_julie'), states('climate.radiateur_chambre_julie')) }}
+            icon: "mdi:bed-outline"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_julie', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_chambre_julie') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-julie"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_chambre_pablo"
+            primary: "Chambre Pablo"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_chambre_pablo', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_chambre_pablo', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_pablo'), states('climate.radiateur_chambre_pablo')) }}
+            icon: "mdi:bed-outline"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_pablo', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_chambre_pablo') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-pablo"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_grande_chambre_amis"
+            primary: "Grande chambre amis"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_grande_chambre_amis', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_grande_chambre_amis', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_grande_chambre_amis'), states('climate.radiateur_grande_chambre_amis')) }}
+            icon: "mdi:bed-empty"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_grande_chambre_amis', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_grande_chambre_amis') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-grande-chambre-amis"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_petite_chambre_amis"
+            primary: "Petite chambre amis"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_petite_chambre_amis', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_petite_chambre_amis', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_petite_chambre_amis'), states('climate.radiateur_petite_chambre_amis')) }}
+            icon: "mdi:bed-empty"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_petite_chambre_amis', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_petite_chambre_amis') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-petite-chambre-amis"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_chambre_mathias"
+            primary: "Chambre Mathias"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_chambre_mathias', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_chambre_mathias', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_mathias'), states('climate.radiateur_chambre_mathias')) }}
+            icon: "mdi:bed"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_mathias', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_chambre_mathias') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-mathias"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_sdb_garcons"
+            primary: "SDB garçons"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_sdb_garcons', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_sdb_garcons', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_garcons'), states('climate.radiateur_sdb_garcons')) }}
+            icon: "mdi:shower-head"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_garcons', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_sdb_garcons') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-sdb-garcons"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_sdb_julie"
+            primary: "SDB Julie"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_sdb_julie', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_sdb_julie', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_julie'), states('climate.radiateur_sdb_julie')) }}
+            icon: "mdi:shower-head"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_julie', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_sdb_julie') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-sdb-julie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+  -
+    title: "Sous-sol"
+    path: "chauffage-zone-sous-sol"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Sous-sol"
+            subtitle: "Synthèse de la zone · commandes dans chaque pièce"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Pièces"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_atelier"
+            primary: "Atelier"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_atelier', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_atelier', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_atelier'), states('climate.radiateur_atelier')) }}
+            icon: "mdi:tools"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_atelier', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_atelier') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-atelier"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_salle_cine"
+            primary: "Salle ciné"
+            secondary: >-
+              {% set current = state_attr('climate.radiateur_salle_cine', 'current_temperature') %}
+              {% set target = state_attr('climate.radiateur_salle_cine', 'temperature') %}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_salle_cine'), states('climate.radiateur_salle_cine')) }}
+            icon: "mdi:movie-open"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_salle_cine', 'hvac_action') == 'heating' else 'disabled' }}"
+            badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_salle_cine') in ['unknown', 'unavailable'] else '' }}"
+            badge_color: "red"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-salle-cine"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+  -
+    title: "Chambre parents"
+    path: "chauffage-piece-chambre-parents"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-parents"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Chambre parents"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_parents"
+            name: "Chambre parents"
+            icon: "mdi:bed-king-outline"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_parents"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_parents') in ['auto','heat'] and state_attr('climate.radiateur_parents', 'temperature') is number and state_attr('climate.radiateur_parents', 'current_temperature') is number and state_attr('climate.radiateur_parents', 'temperature') - state_attr('climate.radiateur_parents', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_parents_battery') }} % · {{ states('climate.radiateur_parents') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_parents', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "chambre_parents"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-chambre-parents"
+  -
+    title: "Planning Chambre parents"
+    path: "chauffage-planning-piece-chambre-parents"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-chambre-parents"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Chambre parents"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_chambre_parents_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_chambre_parents_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_chambre_parents_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "chambre_parents"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-parents"
+  -
+    title: "Dressing"
+    path: "chauffage-piece-dressing"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-parents"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Dressing"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_dressing"
+            name: "Dressing"
+            icon: "mdi:hanger"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_dressing"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_dressing') in ['auto','heat'] and state_attr('climate.radiateur_dressing', 'temperature') is number and state_attr('climate.radiateur_dressing', 'current_temperature') is number and state_attr('climate.radiateur_dressing', 'temperature') - state_attr('climate.radiateur_dressing', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_dressing_battery') }} % · {{ states('climate.radiateur_dressing') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_dressing', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "dressing"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-dressing"
+  -
+    title: "Planning Dressing"
+    path: "chauffage-planning-piece-dressing"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-dressing"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Dressing"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_dressing_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_dressing_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_dressing_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "dressing"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-dressing"
+  -
+    title: "SDB parents"
+    path: "chauffage-piece-sdb-parents"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-parents"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "SDB parents"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_sdb_parents"
+            name: "SDB parents"
+            icon: "mdi:shower-head"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_sdb_parents"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_sdb_parents') in ['auto','heat'] and state_attr('climate.radiateur_sdb_parents', 'temperature') is number and state_attr('climate.radiateur_sdb_parents', 'current_temperature') is number and state_attr('climate.radiateur_sdb_parents', 'temperature') - state_attr('climate.radiateur_sdb_parents', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_sdb_parents_battery') }} % · {{ states('climate.radiateur_sdb_parents') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_parents', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "sdb_parents"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-sdb-parents"
+  -
+    title: "Planning SDB parents"
+    path: "chauffage-planning-piece-sdb-parents"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-sdb-parents"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · SDB parents"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_sdb_parents_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_sdb_parents_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_sdb_parents_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "sdb_parents"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-sdb-parents"
+  -
+    title: "Chambre Julie"
+    path: "chauffage-piece-chambre-julie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Chambre Julie"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_chambre_julie"
+            name: "Chambre Julie"
+            icon: "mdi:bed-outline"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_chambre_julie"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_chambre_julie') in ['auto','heat'] and state_attr('climate.radiateur_chambre_julie', 'temperature') is number and state_attr('climate.radiateur_chambre_julie', 'current_temperature') is number and state_attr('climate.radiateur_chambre_julie', 'temperature') - state_attr('climate.radiateur_chambre_julie', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_chambre_julie_battery') }} % · {{ states('climate.radiateur_chambre_julie') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_julie', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "chambre_julie"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-chambre-julie"
+  -
+    title: "Planning Chambre Julie"
+    path: "chauffage-planning-piece-chambre-julie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-chambre-julie"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Chambre Julie"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_chambre_julie_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_chambre_julie_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_chambre_julie_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "chambre_julie"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-julie"
+  -
+    title: "Chambre Pablo"
+    path: "chauffage-piece-chambre-pablo"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Chambre Pablo"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_chambre_pablo"
+            name: "Chambre Pablo"
+            icon: "mdi:bed-outline"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_chambre_pablo"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_chambre_pablo') in ['auto','heat'] and state_attr('climate.radiateur_chambre_pablo', 'temperature') is number and state_attr('climate.radiateur_chambre_pablo', 'current_temperature') is number and state_attr('climate.radiateur_chambre_pablo', 'temperature') - state_attr('climate.radiateur_chambre_pablo', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_chambre_pablo_battery') }} % · {{ states('climate.radiateur_chambre_pablo') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_pablo', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "chambre_pablo"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-chambre-pablo"
+  -
+    title: "Planning Chambre Pablo"
+    path: "chauffage-planning-piece-chambre-pablo"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-chambre-pablo"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Chambre Pablo"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_chambre_pablo_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_chambre_pablo_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_chambre_pablo_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "chambre_pablo"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-pablo"
+  -
+    title: "Grande chambre amis"
+    path: "chauffage-piece-grande-chambre-amis"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Grande chambre amis"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_grande_chambre_amis"
+            name: "Grande chambre amis"
+            icon: "mdi:bed-empty"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_grande_chambre_amis"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_grande_chambre_amis') in ['auto','heat'] and state_attr('climate.radiateur_grande_chambre_amis', 'temperature') is number and state_attr('climate.radiateur_grande_chambre_amis', 'current_temperature') is number and state_attr('climate.radiateur_grande_chambre_amis', 'temperature') - state_attr('climate.radiateur_grande_chambre_amis', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_grande_chambre_amis_battery') }} % · {{ states('climate.radiateur_grande_chambre_amis') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_grande_chambre_amis', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "grande_chambre_amis"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-grande-chambre-amis"
+  -
+    title: "Planning Grande chambre amis"
+    path: "chauffage-planning-piece-grande-chambre-amis"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-grande-chambre-amis"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Grande chambre amis"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_grande_chambre_amis_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_grande_chambre_amis_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_grande_chambre_amis_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "grande_chambre_amis"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-grande-chambre-amis"
+  -
+    title: "Petite chambre amis"
+    path: "chauffage-piece-petite-chambre-amis"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Petite chambre amis"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_petite_chambre_amis"
+            name: "Petite chambre amis"
+            icon: "mdi:bed-empty"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_petite_chambre_amis"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_petite_chambre_amis') in ['auto','heat'] and state_attr('climate.radiateur_petite_chambre_amis', 'temperature') is number and state_attr('climate.radiateur_petite_chambre_amis', 'current_temperature') is number and state_attr('climate.radiateur_petite_chambre_amis', 'temperature') - state_attr('climate.radiateur_petite_chambre_amis', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_petite_chambre_amis_battery') }} % · {{ states('climate.radiateur_petite_chambre_amis') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_petite_chambre_amis', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "petite_chambre_amis"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-petite-chambre-amis"
+  -
+    title: "Planning Petite chambre amis"
+    path: "chauffage-planning-piece-petite-chambre-amis"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-petite-chambre-amis"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Petite chambre amis"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_petite_chambre_amis_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_petite_chambre_amis_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_petite_chambre_amis_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "petite_chambre_amis"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-petite-chambre-amis"
+  -
+    title: "Chambre Mathias"
+    path: "chauffage-piece-chambre-mathias"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Chambre Mathias"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_chambre_mathias"
+            name: "Chambre Mathias"
+            icon: "mdi:bed"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_chambre_mathias"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_chambre_mathias') in ['auto','heat'] and state_attr('climate.radiateur_chambre_mathias', 'temperature') is number and state_attr('climate.radiateur_chambre_mathias', 'current_temperature') is number and state_attr('climate.radiateur_chambre_mathias', 'temperature') - state_attr('climate.radiateur_chambre_mathias', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_chambre_mathias_battery') }} % · {{ states('climate.radiateur_chambre_mathias') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_mathias', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "chambre_mathias"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-chambre-mathias"
+  -
+    title: "Planning Chambre Mathias"
+    path: "chauffage-planning-piece-chambre-mathias"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-chambre-mathias"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Chambre Mathias"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_chambre_mathias_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_chambre_mathias_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_chambre_mathias_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "chambre_mathias"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-chambre-mathias"
+  -
+    title: "SDB garçons"
+    path: "chauffage-piece-sdb-garcons"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "SDB garçons"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_sdb_garcons"
+            name: "SDB garçons"
+            icon: "mdi:shower-head"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_sdb_garcons"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_sdb_garcons') in ['auto','heat'] and state_attr('climate.radiateur_sdb_garcons', 'temperature') is number and state_attr('climate.radiateur_sdb_garcons', 'current_temperature') is number and state_attr('climate.radiateur_sdb_garcons', 'temperature') - state_attr('climate.radiateur_sdb_garcons', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_sdb_garcons_battery') }} % · {{ states('climate.radiateur_sdb_garcons') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_garcons', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "sdb_garcons"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-sdb-garcons"
+  -
+    title: "Planning SDB garçons"
+    path: "chauffage-planning-piece-sdb-garcons"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-sdb-garcons"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · SDB garçons"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_sdb_mathias_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_sdb_mathias_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_sdb_mathias_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "sdb_garcons"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-sdb-garcons"
+  -
+    title: "SDB Julie"
+    path: "chauffage-piece-sdb-julie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "SDB Julie"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_sdb_julie"
+            name: "SDB Julie"
+            icon: "mdi:shower-head"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_sdb_julie"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_sdb_julie') in ['auto','heat'] and state_attr('climate.radiateur_sdb_julie', 'temperature') is number and state_attr('climate.radiateur_sdb_julie', 'current_temperature') is number and state_attr('climate.radiateur_sdb_julie', 'temperature') - state_attr('climate.radiateur_sdb_julie', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_sdb_julie_battery') }} % · {{ states('climate.radiateur_sdb_julie') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_julie', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "sdb_julie"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-sdb-julie"
+  -
+    title: "Planning SDB Julie"
+    path: "chauffage-planning-piece-sdb-julie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-sdb-julie"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · SDB Julie"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_sdb_julie_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_sdb_julie_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_sdb_julie_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "sdb_julie"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-sdb-julie"
+  -
+    title: "Buanderie"
+    path: "chauffage-piece-buanderie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-v2"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Buanderie"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_buanderie"
+            name: "Buanderie"
+            icon: "mdi:washing-machine"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_buanderie"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_buanderie') in ['auto','heat'] and state_attr('climate.radiateur_buanderie', 'temperature') is number and state_attr('climate.radiateur_buanderie', 'current_temperature') is number and state_attr('climate.radiateur_buanderie', 'temperature') - state_attr('climate.radiateur_buanderie', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_buanderie_battery') }} % · {{ states('climate.radiateur_buanderie') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_buanderie', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "buanderie"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-buanderie"
+  -
+    title: "Planning Buanderie"
+    path: "chauffage-planning-piece-buanderie"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-buanderie"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Buanderie"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_buanderie_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_buanderie_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_buanderie_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "buanderie"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-buanderie"
+  -
+    title: "Atelier"
+    path: "chauffage-piece-atelier"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-sous-sol"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Atelier"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_atelier"
+            name: "Atelier"
+            icon: "mdi:tools"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_atelier"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_atelier') in ['auto','heat'] and state_attr('climate.radiateur_atelier', 'temperature') is number and state_attr('climate.radiateur_atelier', 'current_temperature') is number and state_attr('climate.radiateur_atelier', 'temperature') - state_attr('climate.radiateur_atelier', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_atelier_battery') }} % · {{ states('climate.radiateur_atelier') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_atelier', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "atelier"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-atelier"
+  -
+    title: "Planning Atelier"
+    path: "chauffage-planning-piece-atelier"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-atelier"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Atelier"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_atelier_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_atelier_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_atelier_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "atelier"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-atelier"
+  -
+    title: "Salle ciné"
+    path: "chauffage-piece-salle-cine"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-zone-sous-sol"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Salle ciné"
+          -
+            type: "custom:mushroom-climate-card"
+            entity: "climate.radiateur_salle_cine"
+            name: "Salle ciné"
+            icon: "mdi:movie-open"
+            show_temperature_control: true
+            collapsible_controls: false
+            hvac_modes:
+              - "off"
+              - "heat"
+              - "auto"
+          -
+            type: "custom:mushroom-template-card"
+            entity: "climate.radiateur_salle_cine"
+            primary: "{{ 'Demande de chauffage' if states('climate.radiateur_salle_cine') in ['auto','heat'] and state_attr('climate.radiateur_salle_cine', 'temperature') is number and state_attr('climate.radiateur_salle_cine', 'current_temperature') is number and state_attr('climate.radiateur_salle_cine', 'temperature') - state_attr('climate.radiateur_salle_cine', 'current_temperature') > 0.5 else 'Aucune demande' }}"
+            secondary: "Batterie {{ states('sensor.radiateur_salle_cine_battery') }} % · {{ states('climate.radiateur_salle_cine') }}"
+            icon: "mdi:radiator"
+            icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_salle_cine', 'hvac_action') == 'heating' else 'disabled' }}"
+            tap_action:
+              action: "more-info"
+          -
+            type: "custom:mushroom-chips-card"
+            alignment: "justify"
+            chips:
+              -
+                type: "template"
+                content: "Boost"
+                icon: "mdi:fire"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "script.chauffage_boost_cible"
+                  data:
+                    cible: "salle_cine"
+                icon_color: "deep-orange"
+              -
+                type: "template"
+                content: "Planning"
+                icon: "mdi:calendar-clock"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/chauffage-planning-piece-salle-cine"
+  -
+    title: "Planning Salle ciné"
+    path: "chauffage-planning-piece-salle-cine"
+    subview: true
+    back_path: "/lovelace-mobile/chauffage-piece-salle-cine"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-title-card"
+            title: "Planning · Salle ciné"
+            subtitle: "Six changements requis par type de journée"
+          -
+            type: "markdown"
+            content: "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`."
+          -
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              -
+                entity: "input_text.chauffage_planning_salle_cine_semaine"
+                name: "Semaine"
+              -
+                entity: "input_text.chauffage_planning_salle_cine_samedi"
+                name: "Samedi"
+              -
+                entity: "input_text.chauffage_planning_salle_cine_dimanche"
+                name: "Dimanche"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Enregistrer et appliquer"
+            secondary: "Copie le planning vers les vannes puis active Auto"
+            icon: "mdi:calendar-check"
+            icon_color: "cyan"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.chauffage_appliquer_planning_cible"
+              data:
+                cible: "salle_cine"
+            hold_action:
+              action: "none"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Retour"
+            icon: "mdi:arrow-left"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-piece-salle-cine"

@@ -1,0 +1,61 @@
+alias: Gestion eau chaude Alfea heures creuses
+description: >
+  Autorise l’ECS pendant les heures creuses et attend la fin d’un cycle
+  en cours avant de la désactiver.
+triggers:
+  - trigger: time
+    at: "00:54:00"
+    id: debut_nuit
+  - trigger: time
+    at: "07:24:00"
+    id: fin_nuit
+  - trigger: time
+    at: "11:54:00"
+    id: debut_midi
+  - trigger: time
+    at: "13:24:00"
+    id: fin_midi
+  - trigger: homeassistant
+    event: start
+    id: demarrage_ha
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: [debut_nuit, debut_midi]
+        sequence:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.atlantic_alfea_m_duo_eau_chaude
+      - conditions:
+          - condition: trigger
+            id: demarrage_ha
+          - condition: or
+            conditions:
+              - condition: time
+                after: "00:54:00"
+                before: "07:24:00"
+              - condition: time
+                after: "11:54:00"
+                before: "13:24:00"
+        sequence:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.atlantic_alfea_m_duo_eau_chaude
+    default:
+      - if:
+          - condition: state
+            entity_id: binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99
+            state: "on"
+        then:
+          - wait_template: >
+              {{ is_state(
+                'binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99',
+                'off'
+              ) }}
+            timeout: "01:30:00"
+            continue_on_timeout: true
+      - action: switch.turn_off
+        target:
+          entity_id: switch.atlantic_alfea_m_duo_eau_chaude
+mode: restart
