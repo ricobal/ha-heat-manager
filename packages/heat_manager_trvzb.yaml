@@ -618,7 +618,6 @@ template:
             {{ s[0] if s | count == 1 else 'mixte' }}
       - name: Chauffage. Zone parents
         unique_id: chauffage_zone_parents_resume
-        default_entity_id: sensor.chauffage_zone_parents
         icon: mdi:bed-king-outline
         state: >-
           {% set vannes = ['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents'] %}
@@ -654,7 +653,6 @@ template:
             {{ modes[0] if modes | count == 1 else 'mixte' }}
       - name: Chauffage. Premier étage
         unique_id: chauffage_premier_etage_resume
-        default_entity_id: sensor.chauffage_premier_etage
         icon: mdi:home-floor-1
         state: >-
           {% set vannes = ['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie'] %}
@@ -692,7 +690,6 @@ template:
   - binary_sensor:
       - name: Chauffage. Demande chauffage
         unique_id: chauffage_demande_chauffage
-        default_entity_id: binary_sensor.chauffage_demande_chauffage
         icon: mdi:radiator
         delay_on: "00:15:00"
         state: >-
