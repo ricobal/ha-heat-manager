@@ -129,18 +129,12 @@ ZONES = [
         "key": "zone_parents",
         "title": "Zone parents",
         "icon": "mdi:bed-king-outline",
-        "summary": "sensor.chauffage_zone_parents",
-        "consigne": "input_number.chauffage_consigne_zone_parents",
-        "planning": "zone_parents",
         "rooms": ["chambre_parents", "dressing", "sdb_parents"],
     },
     {
         "key": "premier_etage",
         "title": "1er étage",
         "icon": "mdi:home-floor-1",
-        "summary": "sensor.chauffage_premier_etage",
-        "consigne": "input_number.chauffage_consigne_premier_etage",
-        "planning": "premier_etage",
         "rooms": [
             "chambre_julie",
             "chambre_pablo",
@@ -155,18 +149,12 @@ ZONES = [
         "key": "buanderie",
         "title": "Buanderie",
         "icon": "mdi:washing-machine",
-        "summary": "sensor.chauffage_buanderie",
-        "consigne": "input_number.chauffage_consigne_buanderie",
-        "planning": "buanderie",
         "rooms": ["buanderie"],
     },
     {
         "key": "sous_sol",
         "title": "Sous-sol",
         "icon": "mdi:home-floor-negative-1",
-        "summary": "sensor.chauffage_sous_sol",
-        "consigne": "input_number.chauffage_consigne_sous_sol",
-        "planning": "sous_sol",
         "rooms": ["atelier", "salle_cine"],
     },
 ]
@@ -257,17 +245,20 @@ def room_card(room_key: str) -> dict[str, Any]:
 
 
 def zone_card(zone: dict[str, Any]) -> dict[str, Any]:
-    summary = zone["summary"]
+    entities = [ROOMS[key]["entity"] for key in zone["rooms"]]
+    entity_list = repr(entities).replace('"', "'")
     room_count = len(zone["rooms"])
     demand_template = (
-        "{% set entities = " + repr([ROOMS[key]["entity"] for key in zone["rooms"]]).replace('"', "'") + " %}\n"
-        "{% set ns = namespace(total=0) %}\n"
+        "{% set entities = " + entity_list + " %}\n"
+        "{% set ns = namespace(total=0, temperatures=[]) %}\n"
         "{% for entity in entities %}"
         "{% set target = state_attr(entity, 'temperature') %}"
         "{% set current = state_attr(entity, 'current_temperature') %}"
+        "{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}"
         "{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}"
         "{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}\n"
-        "{{ ns.total }} sur " + str(room_count) + " en demande · {{ states('" + summary + "') }} °C"
+        "{% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}"
+        "{{ ns.total }} sur " + str(room_count) + " en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}"
     )
     destination = (
         f"chauffage-piece-{zone['rooms'][0].replace('_', '-')}"
@@ -276,11 +267,11 @@ def zone_card(zone: dict[str, Any]) -> dict[str, Any]:
     )
     return {
         "type": "custom:mushroom-template-card",
-        "entity": summary,
+        "entity": entities[0],
         "primary": zone["title"],
         "secondary": demand_template,
         "icon": zone["icon"],
-        "icon_color": "{{ 'deep-orange' if state_attr('" + summary + "', 'en_chauffe') | int(0) > 0 else 'disabled' }}",
+        "icon_color": "{{ 'deep-orange' if expand(" + entity_list + ") | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}",
         "tap_action": nav(destination)
     }
 

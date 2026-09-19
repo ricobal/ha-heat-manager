@@ -1,4 +1,4 @@
-# Heat Manager TRVZB v2.1.0-beta.1
+# Heat Manager TRVZB v2.1.0-beta.2
 # À placer dans /config/packages/heat_manager_trvzb.yaml
 # Les helpers existants restaurent leur dernier état : ne pas ajouter initial.
 # Les valeurs de référence ci-dessous ne sont pas des valeurs par défaut actives.
@@ -30,111 +30,6 @@ input_number:
     unit_of_measurement: "°C"
     # Valeur de référence (état restauré au démarrage) : 19
     icon: mdi:home-thermometer
-  chauffage_profil_sdb:
-    name: Profil chauffage. Salle de bain
-    min: 15
-    max: 28
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 21.5
-    icon: mdi:shower
-  chauffage_profil_boost:
-    name: Profil chauffage. Boost
-    min: 18
-    max: 30
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 24
-    icon: mdi:fire
-  chauffage_consigne_chambres_inoccupees:
-    name: Consigne. Chambres inoccupées
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 12.0
-    icon: mdi:bed-empty
-  chauffage_consigne_chambre_mathias:
-    name: Consigne. Chambre Mathias
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 19.0
-    icon: mdi:bed
-  # Identifiant historique conservé pour restaurer la valeur existante.
-  chauffage_consigne_sdb_mathias:
-    name: Consigne. SDB garçons
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 21.5
-    icon: mdi:shower-head
-  chauffage_consigne_sdb_julie:
-    name: Consigne. SDB Julie
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 21.5
-    icon: mdi:shower-head
-  chauffage_consigne_chambre_parents:
-    name: Consigne. Chambre parents
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 19.0
-    icon: mdi:bed-king-outline
-  chauffage_consigne_dressing:
-    name: Consigne. Dressing
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 17.0
-    icon: mdi:hanger
-  chauffage_consigne_sdb_parents:
-    name: Consigne. SDB parents
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 21.5
-    icon: mdi:shower-head
-  chauffage_consigne_sous_sol:
-    name: Consigne. Sous-sol
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 16.0
-    icon: mdi:home-floor-negative-1
-  chauffage_consigne_buanderie:
-    name: Consigne. Buanderie
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 16.0
-    icon: mdi:washing-machine
-  chauffage_consigne_zone_parents:
-    name: Consigne. Zone parents
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 19.0
-    icon: mdi:bed-king-outline
-  chauffage_consigne_premier_etage:
-    name: Consigne. 1er étage
-    min: 4
-    max: 35
-    step: 0.5
-    unit_of_measurement: "°C"
-    # Valeur de référence (état restauré au démarrage) : 19.0
-    icon: mdi:home-floor-1
   chauffage_duree_boost:
     name: Durée du boost
     min: 5
@@ -157,18 +52,6 @@ input_select:
     icon: mdi:home-thermometer-outline
 
 input_text:
-  chauffage_planning_chambres_inoccupees_semaine:
-    name: Planning Chambres inoccupées. Semaine
-    max: 255
-    # Valeur de référence (état restauré au démarrage) : "00:00/12 06:30/12 08:30/12 12:00/12 18:00/12 22:30/12"
-  chauffage_planning_chambres_inoccupees_samedi:
-    name: Planning Chambres inoccupées. Samedi
-    max: 255
-    # Valeur de référence (état restauré au démarrage) : "00:00/12 08:00/12 10:00/12 12:00/12 18:00/12 23:00/12"
-  chauffage_planning_chambres_inoccupees_dimanche:
-    name: Planning Chambres inoccupées. Dimanche
-    max: 255
-    # Valeur de référence (état restauré au démarrage) : "00:00/12 08:00/12 10:00/12 12:00/12 18:00/12 22:30/12"
   chauffage_planning_chambre_mathias_semaine:
     name: Planning Chambre Mathias. Semaine
     max: 255
@@ -242,18 +125,6 @@ input_text:
     name: Planning SDB parents. Dimanche
     max: 255
     # Valeur de référence (état restauré au démarrage) : "00:00/16 08:00/21.5 10:00/16 18:00/16 19:00/21.5 22:30/16"
-  chauffage_planning_sous_sol_semaine:
-    name: Planning Sous-sol. Semaine
-    max: 255
-    # Valeur de référence (état restauré au démarrage) : "00:00/16 06:30/17 08:30/16 12:00/16 18:00/17 22:30/16"
-  chauffage_planning_sous_sol_samedi:
-    name: Planning Sous-sol. Samedi
-    max: 255
-    # Valeur de référence (état restauré au démarrage) : "00:00/16 08:00/17 10:00/16 12:00/16 18:00/17 23:00/16"
-  chauffage_planning_sous_sol_dimanche:
-    name: Planning Sous-sol. Dimanche
-    max: 255
-    # Valeur de référence (état restauré au démarrage) : "00:00/16 08:00/17 10:00/16 12:00/16 18:00/17 22:30/16"
   chauffage_planning_buanderie_semaine:
     name: Planning Buanderie. Semaine
     max: 255
@@ -266,30 +137,6 @@ input_text:
     name: Planning Buanderie. Dimanche
     max: 255
     # Valeur de référence (état restauré au démarrage) : "00:00/16 08:00/17 10:00/16 12:00/16 18:00/17 22:30/16"
-  chauffage_planning_zone_parents_semaine:
-    name: Planning Zone parents. Semaine
-    max: 255
-    # Valeur de référence : "00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17"
-  chauffage_planning_zone_parents_samedi:
-    name: Planning Zone parents. Samedi
-    max: 255
-    # Valeur de référence : "00:00/17 08:00/19 10:00/19 12:00/19 18:00/19 23:00/17"
-  chauffage_planning_zone_parents_dimanche:
-    name: Planning Zone parents. Dimanche
-    max: 255
-    # Valeur de référence : "00:00/17 08:00/19 10:00/19 12:00/19 18:00/19 22:30/17"
-  chauffage_planning_premier_etage_semaine:
-    name: Planning 1er étage. Semaine
-    max: 255
-    # Valeur de référence : "00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17"
-  chauffage_planning_premier_etage_samedi:
-    name: Planning 1er étage. Samedi
-    max: 255
-    # Valeur de référence : "00:00/17 08:00/19 10:00/19 12:00/19 18:00/19 23:00/17"
-  chauffage_planning_premier_etage_dimanche:
-    name: Planning 1er étage. Dimanche
-    max: 255
-    # Valeur de référence : "00:00/17 08:00/19 10:00/19 12:00/19 18:00/19 22:30/17"
   chauffage_planning_chambre_julie_semaine:
     name: Planning Chambre Julie. Semaine
     max: 255
@@ -616,77 +463,6 @@ template:
           mode: >-
             {% set s = expand('climate.radiateur_buanderie') | map(attribute='state') | unique | list %}
             {{ s[0] if s | count == 1 else 'mixte' }}
-      - name: Chauffage. Zone parents
-        unique_id: chauffage_zone_parents_resume
-        icon: mdi:bed-king-outline
-        state: >-
-          {% set vannes = ['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents'] %}
-          {% set ns = namespace(temperatures=[]) %}
-          {% for vanne in vannes %}
-            {% set mesure = state_attr(vanne, 'current_temperature') %}
-            {% if mesure is number %}{% set ns.temperatures = ns.temperatures + [mesure] %}{% endif %}
-          {% endfor %}
-          {{ ((ns.temperatures | sum / ns.temperatures | count) | round(1)) if ns.temperatures | count else none }}
-        unit_of_measurement: "°C"
-        device_class: temperature
-        state_class: measurement
-        attributes:
-          nombre_vannes: 3
-          en_chauffe: >-
-            {{ expand('climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents') | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count }}
-          en_demande: >-
-            {% set vannes = ['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents'] %}
-            {% set ns = namespace(total=0) %}
-            {% for vanne in vannes %}
-              {% set cible = state_attr(vanne, 'temperature') %}
-              {% set mesure = state_attr(vanne, 'current_temperature') %}
-              {% if states(vanne) in ['auto', 'heat'] and cible is number and mesure is number and cible - mesure > 0.5 %}
-                {% set ns.total = ns.total + 1 %}
-              {% endif %}
-            {% endfor %}
-            {{ ns.total }}
-          batterie_minimum: >-
-            {% set batteries = ['sensor.radiateur_parents_battery', 'sensor.radiateur_dressing_battery', 'sensor.radiateur_sdb_parents_battery'] | map('states') | map('float', none) | reject('eq', none) | list %}
-            {{ batteries | min if batteries | count else none }}
-          mode: >-
-            {% set modes = expand('climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents') | map(attribute='state') | unique | list %}
-            {{ modes[0] if modes | count == 1 else 'mixte' }}
-      - name: Chauffage. Premier étage
-        unique_id: chauffage_premier_etage_resume
-        icon: mdi:home-floor-1
-        state: >-
-          {% set vannes = ['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie'] %}
-          {% set ns = namespace(temperatures=[]) %}
-          {% for vanne in vannes %}
-            {% set mesure = state_attr(vanne, 'current_temperature') %}
-            {% if mesure is number %}{% set ns.temperatures = ns.temperatures + [mesure] %}{% endif %}
-          {% endfor %}
-          {{ ((ns.temperatures | sum / ns.temperatures | count) | round(1)) if ns.temperatures | count else none }}
-        unit_of_measurement: "°C"
-        device_class: temperature
-        state_class: measurement
-        attributes:
-          nombre_vannes: 7
-          en_chauffe: >-
-            {{ expand('climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie') | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count }}
-          en_demande: >-
-            {% set vannes = ['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie'] %}
-            {% set ns = namespace(total=0) %}
-            {% for vanne in vannes %}
-              {% set cible = state_attr(vanne, 'temperature') %}
-              {% set mesure = state_attr(vanne, 'current_temperature') %}
-              {% if states(vanne) in ['auto', 'heat'] and cible is number and mesure is number and cible - mesure > 0.5 %}
-                {% set ns.total = ns.total + 1 %}
-              {% endif %}
-            {% endfor %}
-            {{ ns.total }}
-          batterie_minimum: >-
-            {% set batteries = ['sensor.radiateur_chambre_julie_battery', 'sensor.radiateur_chambre_pablo_battery', 'sensor.radiateur_grande_chambre_amis_battery', 'sensor.radiateur_petite_chambre_amis_battery', 'sensor.radiateur_chambre_mathias_battery', 'sensor.radiateur_sdb_garcons_battery', 'sensor.radiateur_sdb_julie_battery'] | map('states') | map('float', none) | reject('eq', none) | list %}
-            {{ batteries | min if batteries | count else none }}
-          mode: >-
-            {% set modes = expand('climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie') | map(attribute='state') | unique | list %}
-            {{ modes[0] if modes | count == 1 else 'mixte' }}
-
   - binary_sensor:
       - name: Chauffage. Demande chauffage
         unique_id: chauffage_demande_chauffage
@@ -830,236 +606,19 @@ template:
             {{ ns.pieces | join(', ') if ns.pieces else 'Aucune' }}
 
 script:
-  chauffage_appliquer_mode_groupe:
-    alias: Chauffage. Appliquer un mode à un groupe
-    mode: queued
-    fields:
-      groupe:
-        required: true
-        selector:
-          select:
-            options: [chambres_inoccupees, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, sous_sol, buanderie]
-      mode_chauffage:
-        required: true
-        selector:
-          select:
-            options: ["off", auto, heat]
-    sequence:
-      - variables:
-          groupes: {chambres_inoccupees: [climate.radiateur_chambre_julie, climate.radiateur_chambre_pablo, climate.radiateur_grande_chambre_amis, climate.radiateur_petite_chambre_amis], chambre_mathias: [climate.radiateur_chambre_mathias], sdb_garcons: [climate.radiateur_sdb_garcons], sdb_julie: [climate.radiateur_sdb_julie], chambre_parents: [climate.radiateur_parents], dressing: [climate.radiateur_dressing], sdb_parents: [climate.radiateur_sdb_parents], sous_sol: [climate.radiateur_atelier, climate.radiateur_salle_cine], buanderie: [climate.radiateur_buanderie]}
-          cibles: "{{ groupes[groupe] }}"
-      - action: climate.set_hvac_mode
-        target:
-          entity_id: "{{ cibles }}"
-        data:
-          hvac_mode: "{{ mode_chauffage }}"
-
-  chauffage_appliquer_consigne_groupe:
-    alias: Chauffage. Appliquer la consigne à un groupe
-    mode: queued
-    fields:
-      groupe:
-        required: true
-        selector:
-          select:
-            options: [chambres_inoccupees, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, sous_sol, buanderie]
-    sequence:
-      - variables:
-          groupes: {chambres_inoccupees: [climate.radiateur_chambre_julie, climate.radiateur_chambre_pablo, climate.radiateur_grande_chambre_amis, climate.radiateur_petite_chambre_amis], chambre_mathias: [climate.radiateur_chambre_mathias], sdb_garcons: [climate.radiateur_sdb_garcons], sdb_julie: [climate.radiateur_sdb_julie], chambre_parents: [climate.radiateur_parents], dressing: [climate.radiateur_dressing], sdb_parents: [climate.radiateur_sdb_parents], sous_sol: [climate.radiateur_atelier, climate.radiateur_salle_cine], buanderie: [climate.radiateur_buanderie]}
-          consignes: {chambres_inoccupees: input_number.chauffage_consigne_chambres_inoccupees, chambre_mathias: input_number.chauffage_consigne_chambre_mathias, sdb_garcons: input_number.chauffage_consigne_sdb_mathias, sdb_julie: input_number.chauffage_consigne_sdb_julie, chambre_parents: input_number.chauffage_consigne_chambre_parents, dressing: input_number.chauffage_consigne_dressing, sdb_parents: input_number.chauffage_consigne_sdb_parents, sous_sol: input_number.chauffage_consigne_sous_sol, buanderie: input_number.chauffage_consigne_buanderie}
-          cibles: "{{ groupes[groupe] }}"
-          temperature_cible: "{{ states(consignes[groupe]) | float }}"
-      - action: climate.set_temperature
-        target:
-          entity_id: "{{ cibles }}"
-        data:
-          temperature: "{{ temperature_cible }}"
-          hvac_mode: heat
-
-  chauffage_appliquer_planning_groupe:
-    alias: Chauffage. Copier le planning du groupe vers les vannes
-    mode: queued
-    fields:
-      groupe:
-        required: true
-        selector:
-          select:
-            options: [chambres_inoccupees, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, sous_sol, buanderie]
-    sequence:
-      - variables:
-          bases: {chambres_inoccupees: [radiateur_chambre_julie, radiateur_chambre_pablo, radiateur_grande_chambre_amis, radiateur_petite_chambre_amis], chambre_mathias: [radiateur_chambre_mathias], sdb_garcons: [radiateur_sdb_garcons], sdb_julie: [radiateur_sdb_julie], chambre_parents: [radiateur_parents], dressing: [radiateur_dressing], sdb_parents: [radiateur_sdb_parents], sous_sol: [radiateur_atelier, radiateur_salle_cine], buanderie: [radiateur_buanderie]}
-          planning_slug: "{{ 'sdb_mathias' if groupe == 'sdb_garcons' else groupe }}"
-          planning_semaine: "{{ states('input_text.chauffage_planning_' ~ planning_slug ~ '_semaine') }}"
-          planning_samedi: "{{ states('input_text.chauffage_planning_' ~ planning_slug ~ '_samedi') }}"
-          planning_dimanche: "{{ states('input_text.chauffage_planning_' ~ planning_slug ~ '_dimanche') }}"
-      - repeat:
-          for_each: "{{ bases[groupe] }}"
-          sequence:
-            - variables:
-                base: "{{ repeat.item }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_monday"
-              data:
-                value: "{{ planning_semaine }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_tuesday"
-              data:
-                value: "{{ planning_semaine }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_wednesday"
-              data:
-                value: "{{ planning_semaine }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_thursday"
-              data:
-                value: "{{ planning_semaine }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_friday"
-              data:
-                value: "{{ planning_semaine }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_saturday"
-              data:
-                value: "{{ planning_samedi }}"
-            - action: text.set_value
-              target:
-                entity_id: "text.{{ base }}_weekly_schedule_sunday"
-              data:
-                value: "{{ planning_dimanche }}"
-            - action: climate.set_hvac_mode
-              target:
-                entity_id: "climate.{{ base }}"
-              data:
-                hvac_mode: auto
-
-  chauffage_boost_groupe:
-    alias: Chauffage. Boost d’un groupe
-    mode: queued
-    fields:
-      groupe:
-        required: true
-        selector:
-          select:
-            options: [chambres_inoccupees, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, sous_sol, buanderie]
-    sequence:
-      - variables:
-          bases: {chambres_inoccupees: [radiateur_chambre_julie, radiateur_chambre_pablo, radiateur_grande_chambre_amis, radiateur_petite_chambre_amis], chambre_mathias: [radiateur_chambre_mathias], sdb_garcons: [radiateur_sdb_garcons], sdb_julie: [radiateur_sdb_julie], chambre_parents: [radiateur_parents], dressing: [radiateur_dressing], sdb_parents: [radiateur_sdb_parents], sous_sol: [radiateur_atelier, radiateur_salle_cine], buanderie: [radiateur_buanderie]}
-          duree: "{{ states('input_number.chauffage_duree_boost') | int }}"
-      - repeat:
-          for_each: "{{ bases[groupe] }}"
-          sequence:
-            - action: number.set_value
-              target:
-                entity_id: "number.{{ repeat.item }}_temporary_mode_duration"
-              data:
-                value: "{{ duree }}"
-            - action: select.select_option
-              target:
-                entity_id: "select.{{ repeat.item }}_temporary_mode_select"
-              data:
-                option: boost
-
-  chauffage_appliquer_mode_cible:
-    alias: Chauffage. Appliquer un mode à une zone ou une pièce
-    mode: queued
-    fields:
-      cible:
-        required: true
-        selector:
-          select:
-            options: [zone_parents, premier_etage, buanderie, sous_sol, chambre_julie, chambre_pablo, grande_chambre_amis, petite_chambre_amis, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, atelier, salle_cine]
-      mode_chauffage:
-        required: true
-        selector:
-          select:
-            options: ["off", auto, heat]
-    sequence:
-      - variables:
-          cibles:
-            zone_parents: [climate.radiateur_parents, climate.radiateur_dressing, climate.radiateur_sdb_parents]
-            premier_etage: [climate.radiateur_chambre_julie, climate.radiateur_chambre_pablo, climate.radiateur_grande_chambre_amis, climate.radiateur_petite_chambre_amis, climate.radiateur_chambre_mathias, climate.radiateur_sdb_garcons, climate.radiateur_sdb_julie]
-            buanderie: [climate.radiateur_buanderie]
-            sous_sol: [climate.radiateur_atelier, climate.radiateur_salle_cine]
-            chambre_julie: [climate.radiateur_chambre_julie]
-            chambre_pablo: [climate.radiateur_chambre_pablo]
-            grande_chambre_amis: [climate.radiateur_grande_chambre_amis]
-            petite_chambre_amis: [climate.radiateur_petite_chambre_amis]
-            chambre_mathias: [climate.radiateur_chambre_mathias]
-            sdb_garcons: [climate.radiateur_sdb_garcons]
-            sdb_julie: [climate.radiateur_sdb_julie]
-            chambre_parents: [climate.radiateur_parents]
-            dressing: [climate.radiateur_dressing]
-            sdb_parents: [climate.radiateur_sdb_parents]
-            atelier: [climate.radiateur_atelier]
-            salle_cine: [climate.radiateur_salle_cine]
-      - if:
-          - condition: template
-            value_template: "{{ cible not in cibles or mode_chauffage not in ['off', 'auto', 'heat'] }}"
-        then:
-          - stop: "Cible ou mode de chauffage inconnu : aucune commande envoyée."
-            error: true
-      - action: climate.set_hvac_mode
-        target:
-          entity_id: "{{ cibles[cible] }}"
-        data:
-          hvac_mode: "{{ mode_chauffage }}"
-
-  chauffage_appliquer_consigne_zone:
-    alias: Chauffage. Appliquer la consigne d’une zone
-    mode: queued
-    fields:
-      zone:
-        required: true
-        selector:
-          select:
-            options: [zone_parents, premier_etage, buanderie, sous_sol]
-    sequence:
-      - variables:
-          zones:
-            zone_parents: [climate.radiateur_parents, climate.radiateur_dressing, climate.radiateur_sdb_parents]
-            premier_etage: [climate.radiateur_chambre_julie, climate.radiateur_chambre_pablo, climate.radiateur_grande_chambre_amis, climate.radiateur_petite_chambre_amis, climate.radiateur_chambre_mathias, climate.radiateur_sdb_garcons, climate.radiateur_sdb_julie]
-            buanderie: [climate.radiateur_buanderie]
-            sous_sol: [climate.radiateur_atelier, climate.radiateur_salle_cine]
-          consignes:
-            zone_parents: input_number.chauffage_consigne_zone_parents
-            premier_etage: input_number.chauffage_consigne_premier_etage
-            buanderie: input_number.chauffage_consigne_buanderie
-            sous_sol: input_number.chauffage_consigne_sous_sol
-      - if:
-          - condition: template
-            value_template: "{{ zone not in zones or not is_number(states(consignes.get(zone, ''))) }}"
-        then:
-          - stop: "Zone inconnue ou consigne indisponible : aucune commande envoyée."
-            error: true
-      - action: climate.set_temperature
-        target:
-          entity_id: "{{ zones[zone] }}"
-        data:
-          temperature: "{{ states(consignes[zone]) | float }}"
-          hvac_mode: heat
-
   chauffage_appliquer_planning_cible:
-    alias: Chauffage. Appliquer le planning d’une zone ou d’une pièce
+    alias: Chauffage. Appliquer le planning d’une pièce
     mode: queued
     fields:
       cible:
         required: true
         selector:
           select:
-            options: [zone_parents, premier_etage, buanderie, sous_sol, chambre_julie, chambre_pablo, grande_chambre_amis, petite_chambre_amis, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, atelier, salle_cine]
+            options: [buanderie, chambre_julie, chambre_pablo, grande_chambre_amis, petite_chambre_amis, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, atelier, salle_cine]
     sequence:
       - variables:
           cibles:
-            zone_parents: [radiateur_parents, radiateur_dressing, radiateur_sdb_parents]
-            premier_etage: [radiateur_chambre_julie, radiateur_chambre_pablo, radiateur_grande_chambre_amis, radiateur_petite_chambre_amis, radiateur_chambre_mathias, radiateur_sdb_garcons, radiateur_sdb_julie]
             buanderie: [radiateur_buanderie]
-            sous_sol: [radiateur_atelier, radiateur_salle_cine]
             chambre_julie: [radiateur_chambre_julie]
             chambre_pablo: [radiateur_chambre_pablo]
             grande_chambre_amis: [radiateur_grande_chambre_amis]
@@ -1073,10 +632,7 @@ script:
             atelier: [radiateur_atelier]
             salle_cine: [radiateur_salle_cine]
           slugs:
-            zone_parents: zone_parents
-            premier_etage: premier_etage
             buanderie: buanderie
-            sous_sol: sous_sol
             chambre_julie: chambre_julie
             chambre_pablo: chambre_pablo
             grande_chambre_amis: grande_chambre_amis
@@ -1144,21 +700,18 @@ script:
               data: {hvac_mode: auto}
 
   chauffage_boost_cible:
-    alias: Chauffage. Boost d’une zone ou d’une pièce
+    alias: Chauffage. Boost d’une pièce
     mode: queued
     fields:
       cible:
         required: true
         selector:
           select:
-            options: [zone_parents, premier_etage, buanderie, sous_sol, chambre_julie, chambre_pablo, grande_chambre_amis, petite_chambre_amis, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, atelier, salle_cine]
+            options: [buanderie, chambre_julie, chambre_pablo, grande_chambre_amis, petite_chambre_amis, chambre_mathias, sdb_garcons, sdb_julie, chambre_parents, dressing, sdb_parents, atelier, salle_cine]
     sequence:
       - variables:
           cibles:
-            zone_parents: [radiateur_parents, radiateur_dressing, radiateur_sdb_parents]
-            premier_etage: [radiateur_chambre_julie, radiateur_chambre_pablo, radiateur_grande_chambre_amis, radiateur_petite_chambre_amis, radiateur_chambre_mathias, radiateur_sdb_garcons, radiateur_sdb_julie]
             buanderie: [radiateur_buanderie]
-            sous_sol: [radiateur_atelier, radiateur_salle_cine]
             chambre_julie: [radiateur_chambre_julie]
             chambre_pablo: [radiateur_chambre_pablo]
             grande_chambre_amis: [radiateur_grande_chambre_amis]

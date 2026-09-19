@@ -73,57 +73,57 @@ views:
             subtitle: "Synthèse uniquement · commandes dans chaque pièce"
           -
             type: "custom:mushroom-template-card"
-            entity: "sensor.chauffage_zone_parents"
+            entity: "climate.radiateur_parents"
             primary: "Zone parents"
             secondary: >-
               {% set entities = ['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents'] %}
-              {% set ns = namespace(total=0) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
-              {{ ns.total }} sur 3 en demande · {{ states('sensor.chauffage_zone_parents') }} °C
+              {% set ns = namespace(total=0, temperatures=[]) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 3 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:bed-king-outline"
-            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_zone_parents', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
             tap_action:
               action: "navigate"
               navigation_path: "/lovelace-mobile/chauffage-zone-parents"
           -
             type: "custom:mushroom-template-card"
-            entity: "sensor.chauffage_premier_etage"
+            entity: "climate.radiateur_chambre_julie"
             primary: "1er étage"
             secondary: >-
               {% set entities = ['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie'] %}
-              {% set ns = namespace(total=0) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
-              {{ ns.total }} sur 7 en demande · {{ states('sensor.chauffage_premier_etage') }} °C
+              {% set ns = namespace(total=0, temperatures=[]) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 7 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:home-floor-1"
-            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_premier_etage', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
             tap_action:
               action: "navigate"
               navigation_path: "/lovelace-mobile/chauffage-zone-premier-etage"
           -
             type: "custom:mushroom-template-card"
-            entity: "sensor.chauffage_buanderie"
+            entity: "climate.radiateur_buanderie"
             primary: "Buanderie"
             secondary: >-
               {% set entities = ['climate.radiateur_buanderie'] %}
-              {% set ns = namespace(total=0) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
-              {{ ns.total }} sur 1 en demande · {{ states('sensor.chauffage_buanderie') }} °C
+              {% set ns = namespace(total=0, temperatures=[]) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 1 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:washing-machine"
-            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_buanderie', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_buanderie']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
             tap_action:
               action: "navigate"
               navigation_path: "/lovelace-mobile/chauffage-piece-buanderie"
           -
             type: "custom:mushroom-template-card"
-            entity: "sensor.chauffage_sous_sol"
+            entity: "climate.radiateur_atelier"
             primary: "Sous-sol"
             secondary: >-
               {% set entities = ['climate.radiateur_atelier', 'climate.radiateur_salle_cine'] %}
-              {% set ns = namespace(total=0) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
-              {{ ns.total }} sur 2 en demande · {{ states('sensor.chauffage_sous_sol') }} °C
+              {% set ns = namespace(total=0, temperatures=[]) %}
+              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 2 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:home-floor-negative-1"
-            icon_color: "{{ 'deep-orange' if state_attr('sensor.chauffage_sous_sol', 'en_chauffe') | int(0) > 0 else 'disabled' }}"
+            icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_atelier', 'climate.radiateur_salle_cine']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
             tap_action:
               action: "navigate"
               navigation_path: "/lovelace-mobile/chauffage-zone-sous-sol"

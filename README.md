@@ -28,6 +28,8 @@ La page principale montre la PAC, l’ECS, l’absence, la demande des vannes et
 
 Une zone contenant plusieurs pièces ouvre uniquement leur liste. Toutes les commandes sont effectuées dans la pièce. Comme la zone Buanderie ne contient qu’une pièce, elle ouvre directement le thermostat de la buanderie.
 
+Les synthèses de zone sont calculées directement dans les cartes à partir des entités `climate`. Le package ne crée aucun helper, planning, script ou capteur de commande au niveau d’une zone.
+
 ## Contenu du dépôt
 
 - `packages/heat_manager_trvzb.yaml` : helpers, capteurs, scripts et automatisation globale des vannes ;
