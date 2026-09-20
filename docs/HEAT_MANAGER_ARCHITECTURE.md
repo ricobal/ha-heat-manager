@@ -1,395 +1,140 @@
-# Heat Manager . Architecture
+# Architecture actuelle de Heat Manager
 
-## 1. Objectif
+Cartographie statique du 20 septembre 2026, établie sur le sous-dépôt `ha-heat-manager`, révision `981ef44`. Elle décrit les déclarations présentes dans les fichiers, sans validation du fonctionnement sur Home Assistant.
 
-Heat Manager est le système de gestion du chauffage pièce par pièce dans Home Assistant.
+Les deux documents demandés étaient absents lors de la première lecture ; ils ont été créés dans `ha-heat-manager/docs/`, à la demande confirmée de l’utilisateur. Initialement absent, `AGENTS.md` est maintenant disponible et a été lu lors de la reprise. Les copies de fichiers situées dans les dossiers homonymes du répertoire parent ne constituent pas la source de cette cartographie ; leur synchronisation et leur déploiement ne sont pas établis.
 
-Il complète le système de chauffage central existant sans remplacer la régulation interne de la PAC Atlantic.
+## Contexte déclaré dans AGENTS.md
 
-Le projet doit notamment permettre :
+L’installation décrite utilise Home Assistant OS dans une VM sur un NAS Synology DS218+, Zigbee2MQTT, Mosquitto et un coordinateur SLZB-06 en TCP/IP. Le chauffage repose sur une PAC Atlantic Alféa M Duo R290 triphasée, des radiateurs à eau et un thermostat Navilink 228 situé dans le salon, avec régulation Smart Adapt et consigne centrale habituelle proche de 19 °C. Tous les radiateurs ne disposent pas nécessairement d’une vanne connectée. L’interface cible est un téléphone en portrait.
 
-* le pilotage des vannes thermostatiques connectées ;
-* la création de groupes fonctionnels ;
-* le réglage de consignes par pièce ou groupe ;
-* des overrides manuels ;
-* le retour simple au fonctionnement automatique ;
-* une utilisation facile depuis un smartphone.
+Ces informations proviennent des consignes du projet et ne sont pas des observations d’une installation active. Les contrôles et overrides de groupes cités parmi les fonctionnalités attendues dans `AGENTS.md` ne prouvent pas leur implémentation : la cartographie ci-dessous décrit les commandes de pièce, le mode maison et les zones de synthèse effectivement déclarés dans les sources.
 
----
+Les consignes imposent une lecture ciblée, la préservation des identifiants et des changements minimaux. Cette phase reste limitée à la documentation, sans audit fonctionnel ni modification de configuration.
 
-# 2. Architecture chauffage
+## 1. Organisation du dépôt
 
-## Production de chaleur
+| Fichier | Responsabilité | Nature |
+|---|---|---|
+| `packages/heat_manager_trvzb.yaml` | Helpers, synthèses, demande de chauffage, scripts des vannes et réaction au mode maison | Configuration Home Assistant écrite directement |
+| `tools/generate_heat_manager_dashboard.py` | Inventaire des pièces, zones, entités PAC/ECS, construction et sérialisation des vues | Source du tableau de bord |
+| `lovelace/heat_manager_mobile_views.yaml` | Ensemble de 39 vues à fusionner dans `lovelace-mobile` | Artefact généré, versionné |
+| `examples/ecs_hours_offpeak_automation.yaml` | Autorisation ECS selon les heures creuses | Automatisation optionnelle à installer séparément |
+| `README.md` | Présentation, dépendances et installation manuelle | Documentation |
 
-PAC :
+Chacun des quatre dossiers prioritaires contient un seul fichier dans le dépôt observé. Il ne contient ni intégration Home Assistant personnalisée, ni définition des équipements Zigbee, ni suite de tests ou chaîne CI versionnée.
 
-**Atlantic Alféa M Duo R290**
+## 2. Composants et flux
 
-Caractéristiques principales :
-
-* installation triphasée ;
-* chauffage par radiateurs à eau ;
-* production ECS intégrée ;
-* régulation Atlantic en mode Smart Adapt.
-
-## Thermostat central
-
-Thermostat :
-
-**Atlantic Navilink 228**
-
-Localisation :
-
-**salon**
-
-La zone salon est ouverte ou fortement connectée avec :
-
-* salon ;
-* salle à manger ;
-* cuisine.
-
-Consigne centrale habituelle :
-
-**19 °C environ**
-
-Le thermostat central reste un élément important de la demande globale de chauffage faite à la PAC.
-
-Heat Manager ne doit donc pas être considéré comme un système pouvant demander directement de la chaleur à la PAC dans chaque pièce, sauf si une telle fonction est explicitement développée.
-
----
-
-# 3. Vannes thermostatiques
-
-Environ 13 vannes thermostatiques connectées sont utilisées.
-
-Modèle principal :
-
-**Sonoff TRVZB**
-
-Transport :
-
-```text
-TRVZB
-  ↓
-Zigbee
-  ↓
-Zigbee2MQTT
-  ↓
-MQTT
-  ↓
-Home Assistant
-  ↓
-Heat Manager
+```mermaid
+flowchart TD
+    G["Générateur Python : ROOMS, ZONES, constantes"] -->|génération locale| L["39 vues Lovelace"]
+    L -->|boost et planning par pièce| S["Scripts du package"]
+    L -->|thermostat de pièce| V["Entités des 13 vannes"]
+    H["Helpers : profils, durée, plannings"] --> S
+    M["Helper mode maison"] --> A["Automatisation sur changement"]
+    A --> S
+    S -->|services climate, text, number, select| V
+    V --> Z["Zigbee2MQTT / SONOFF TRVZB"]
+    V --> T["Templates de synthèse et demande"]
+    T -->|affichage de la demande| L
+    V -->|synthèses des zones calculées dans les cartes| L
+    L -->|commandes et consultation| P["Entités Atlantic Alféa M : PAC, ECS, absence"]
+    E["Exemple ECS : horaires et démarrage HA"] -->|autorisation ECS| P
+    P -->|état du cycle ECS| E
 ```
 
-Coordinateur Zigbee :
+Le package pilote les vannes par les services Home Assistant ; il ne publie pas directement sur MQTT. Les entités nécessaires sont fournies par l’installation. Les commandes PAC, ECS et absence du tableau de bord utilisent directement les entités Alféa M, sans passer par les scripts TRVZB.
 
-**SLZB-06**
+Le capteur de demande des vannes est consommé par l’interface. Aucune automatisation de ce dépôt ne le relie à une commande de la PAC. L’absence PAC et le profil « Absence » des vannes sont deux chemins distincts, sans synchronisation définie ici.
 
-Connexion :
+## 3. Package TRVZB
 
-**TCP/IP**
+Le fichier porte l’en-tête `v2.1.0-beta.2`. Ses domaines racine sont `input_number`, `input_select`, `input_text`, `template`, `script` et `automation`.
 
-Broker :
+### État conservé dans les helpers
 
-**Mosquitto MQTT**
+| Domaine | Nombre | Rôle |
+|---|---:|---|
+| `input_number` | 4 | Profils absence, nuit, confort et durée du boost |
+| `input_select` | 1 | `chauffage_mode_maison` : Auto, Confort, Nuit, Absence, Arrêt |
+| `input_text` | 39 | Trois plannings par pièce : semaine, samedi, dimanche |
 
----
+Les valeurs de référence sont commentées ; aucun `initial:` actif n’est déclaré. La restauration des états est confiée à Home Assistant. Les plannings sont des chaînes stockées dans les helpers puis transmises explicitement aux entités `text` des vannes.
 
-# 4. Groupes fonctionnels
+### Capteurs calculés
 
-Les vannes sont organisées en groupes correspondant aux usages de la maison.
+Le bloc `template` déclare dix capteurs de synthèse : maison, chambres inoccupées, chambre Mathias, SDB garçons, SDB Julie, chambre parents, dressing, SDB parents, sous-sol et buanderie. Ils lisent températures, modes, activité et batteries ; leurs regroupements ne correspondent pas exactement aux quatre zones de navigation.
 
-## Chambres inoccupées
+Le capteur binaire de demande a pour `unique_id` `chauffage_demande_chauffage`. Son expression compte les vannes en `auto` ou `heat` dont la consigne dépasse la mesure de plus de 0,5 °C, avec un `delay_on` de quinze minutes. Ses attributs exposent les nombres de pièces en demande et en forte demande (écart supérieur à 1 °C), l’écart maximum, la pièce correspondante et la liste des pièces en demande. Le tableau de bord le référence comme `binary_sensor.chauffage_demande_chauffage` ; le registre réel d’entités n’a pas été consulté.
 
-* Chambre Julie
-* Chambre Pablo
-* Grande chambre d'amis
-* Petite chambre d'amis
+### Points d’entrée de commande
 
-## Chambre Mathias
+| Script | Exécution | Entrées et services utilisés |
+|---|---|---|
+| `chauffage_appliquer_planning_cible` | `queued` | `cible` → correspondance pièce/vanne/slug → trois helpers → contrôle de format → sept `text.set_value` → `climate.set_hvac_mode` en Auto |
+| `chauffage_boost_cible` | `queued` | `cible` et helper de durée → `number.set_value` sur la durée temporaire → `select.select_option` avec `boost` |
+| `chauffage_mode_maison_appliquer` | `restart` | Lecture du mode maison et des profils → commandes collectives des treize vannes |
 
-* Chambre Mathias
+Le script planning contient une expression régulière pour six changements `HH:MM/température`, entre 4 et 35 °C par pas de 0,5 °C. La semaine est copiée du lundi au vendredi, puis samedi et dimanche séparément. Cette description ne vaut pas validation exhaustive du format ou du comportement des appareils.
 
-## SDB Mathias
+Pour le mode maison, la branche Auto envoie `auto` ; Arrêt envoie une durée temporaire nulle, une consigne de 7 °C puis `off` ; les profils Confort, Nuit et Absence passent par `climate.set_temperature` avec `hvac_mode: heat`.
 
-* Salle de bain Mathias / garçons
+L’unique automatisation du package, `chauffage_mode_maison_sur_changement`, appelle ce dernier script lors d’une transition entre deux modes valides distincts. Aucun déclencheur de démarrage ou de retour de disponibilité n’y figure.
 
-## SDB Julie
+## 4. Pièces, zones et conventions d’entités
 
-* Salle de bain Julie
+Les zones sont définies dans `ZONES` et les pièces dans `ROOMS` du générateur. Le package possède ses propres listes et dictionnaires de correspondance : il n’est pas généré à partir de `ROOMS`.
 
-## Chambre parents
+| Zone d’interface | Clé de pièce / cible | Base des entités de vanne | Slug du planning |
+|---|---|---|---|
+| Parents | `chambre_parents` | `radiateur_parents` | `chambre_parents` |
+| Parents | `dressing` | `radiateur_dressing` | `dressing` |
+| Parents | `sdb_parents` | `radiateur_sdb_parents` | `sdb_parents` |
+| 1er étage | `chambre_julie` | `radiateur_chambre_julie` | `chambre_julie` |
+| 1er étage | `chambre_pablo` | `radiateur_chambre_pablo` | `chambre_pablo` |
+| 1er étage | `grande_chambre_amis` | `radiateur_grande_chambre_amis` | `grande_chambre_amis` |
+| 1er étage | `petite_chambre_amis` | `radiateur_petite_chambre_amis` | `petite_chambre_amis` |
+| 1er étage | `chambre_mathias` | `radiateur_chambre_mathias` | `chambre_mathias` |
+| 1er étage | `sdb_garcons` | `radiateur_sdb_garcons` | `sdb_mathias` |
+| 1er étage | `sdb_julie` | `radiateur_sdb_julie` | `sdb_julie` |
+| Buanderie | `buanderie` | `radiateur_buanderie` | `buanderie` |
+| Sous-sol | `atelier` | `radiateur_atelier` | `atelier` |
+| Sous-sol | `salle_cine` | `radiateur_salle_cine` | `salle_cine` |
 
-* Chambre parents
+Pour chaque base, les interfaces attendues sont `climate.<base>`, `sensor.<base>_battery`, `text.<base>_weekly_schedule_<jour anglais>`, `number.<base>_temporary_mode_duration` et `select.<base>_temporary_mode_select`. Les helpers suivent `input_text.chauffage_planning_<slug>_<semaine|samedi|dimanche>`.
 
-## Dressing
+Le slug historique `sdb_mathias` et le `unique_id` de synthèse `chauffage_sdb_mathias_resume` sont conservés pour la SDB garçons. Les zones ne constituent pas des cibles de scripts. Il existe néanmoins un capteur de synthèse du sous-sol dans le package.
 
-* Dressing
+## 5. Tableau de bord et génération
 
-## SDB parents
+Le générateur utilise uniquement la bibliothèque standard Python (`json`, `pathlib`, `typing`). `build_views()` compose les vues ; `dump_yaml()` et `scalar()` assurent la sérialisation ; `main()` écrit le fichier Lovelace sous la racine du dépôt. Il ne contacte pas Home Assistant. Le générateur n’a pas été exécuté lors de cette cartographie.
 
-* Salle de bain parents
+Les 39 vues déclarées se répartissent en dix vues générales, trois vues de zones à plusieurs pièces, treize vues de pièces et treize vues de planning. Elles utilisent les Sections, une seule colonne, Mushroom et card-mod.
 
-## Sous-sol
+| Groupe | Routes sous `/lovelace-mobile/` |
+|---|---|
+| Accueil et paramètres | `chauffage-v2`, `chauffage-parametres` |
+| PAC | `chauffage-pac`, `chauffage-pac-planning`, `chauffage-pac-technique`, `chauffage-pac-diagnostic` |
+| ECS | `chauffage-ecs`, `chauffage-ecs-planning`, `chauffage-ecs-historique` |
+| Absence | `chauffage-absence` |
+| Zones | `chauffage-zone-parents`, `chauffage-zone-premier-etage`, `chauffage-zone-sous-sol` |
+| Pièces et planning | `chauffage-piece-<clé avec tirets>`, `chauffage-planning-piece-<clé avec tirets>` |
 
-* Atelier
-* Salle cinéma
+La buanderie est accessible directement comme pièce. Les cartes de zones calculent leurs synthèses depuis les entités `climate`. Chaque pièce présente un thermostat, la batterie, le boost et l’accès au planning. Les paramètres exposent les trois profils et la durée du boost. L’état du mode maison apparaît dans la carte globale ; le helper et son automatisation appartiennent au package.
 
-## Buanderie
+La fonction auxiliaire `mode_chips()` référence `script.chauffage_appliquer_mode_cible`, mais n’est pas appelée par la construction actuelle des vues. Elle doit être distinguée des points d’entrée réellement présents dans l’artefact.
 
-* Buanderie
+Les constantes du générateur fixent les identifiants PAC/ECS/absence sous `atlantic_alfea_m_duo_*`. Le chauffage utilise notamment le `climate` du circuit 1 et le `number` de consigne générale. Le planning PAC affiche sept capteurs quotidiens, sans commande d’écriture. L’absence utilise un switch et deux entités `datetime`. L’historique ECS s’appuie sur une carte `history-graph` de 72 heures ; son stockage historique relève de l’installation Home Assistant.
 
-Les noms exacts des entités Home Assistant doivent être récupérés depuis la configuration.
+## 6. Automatisation ECS séparée
 
-Ce document ne doit pas servir à inventer les `entity_id`.
+L’exemple déclare quatre horaires (00:54, 07:24, 11:54, 13:24) et un déclencheur au démarrage de Home Assistant. Il active l’autorisation ECS au début des plages, ou au démarrage si une plage est en cours. Dans la branche de désactivation, il attend la fin du cycle actif, au maximum 90 minutes, puis coupe le switch. Son mode est `restart`.
 
----
+Ses dépendances sont `switch.atlantic_alfea_m_duo_eau_chaude` et `binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99`. Le tableau de bord attend l’entité `automation.gestion_eau_chaude_alfea_heures_creuses`, définie par la constante `ECS_AUTOMATION`. L’existence de cet identifiant après import n’est pas établie ici.
 
-# 5. Principes de contrôle
+## 7. Frontière de déploiement
 
-Heat Manager doit distinguer deux niveaux.
+Le README prévoit l’inclusion des packages par `homeassistant.packages`, la copie du package et la fusion manuelle des vues dans le tableau de bord en mode stockage. L’exemple ECS est installé indépendamment. Les prérequis déclarés sont Home Assistant avec Sections, Mushroom, card-mod, Zigbee2MQTT, treize SONOFF TRVZB et le composant Atlantic Alféa M (version minimale annoncée : 0.1.0).
 
-## Contrôle individuel
-
-Une vanne peut être pilotée indépendamment :
-
-* mode ;
-* température ;
-* override manuel.
-
-## Contrôle de groupe
-
-Une commande appliquée à un groupe doit pouvoir agir sur les vannes appartenant à ce groupe.
-
-Exemples :
-
-* régler les chambres inoccupées à une température donnée ;
-* réduire le chauffage du sous-sol ;
-* imposer temporairement une température à la buanderie.
-
----
-
-# 6. Modes
-
-Les modes réellement disponibles doivent être dérivés des entités Zigbee2MQTT / Home Assistant.
-
-Les modes utilisés historiquement dans le projet comprennent notamment des notions de :
-
-* off ;
-* heat ;
-* auto ;
-
-ou modes équivalents exposés par les vannes.
-
-Ne jamais coder en dur un mode avant d'avoir vérifié qu'il est réellement accepté par l'entité concernée.
-
----
-
-# 7. Température de consigne
-
-Plage cible utilisée pour l'interface Heat Manager :
-
-```text
-4 °C → 35 °C
-```
-
-Pas :
-
-```text
-0,5 °C
-```
-
-La valeur minimale de 4 °C permet notamment de conserver une logique hors-gel.
-
-Les limites réelles de chaque appareil restent prioritaires.
-
----
-
-# 8. Override
-
-L'architecture Heat Manager doit pouvoir gérer deux types d'override.
-
-## Override individuel
-
-Permet de prendre temporairement le contrôle d'une vanne particulière.
-
-Exemple :
-
-```text
-Groupe Chambres inoccupées = 16 °C
-
-mais
-
-Chambre Julie = 19 °C en override
-```
-
-La logique de groupe ne doit pas immédiatement écraser cet override si le système prévoit explicitement sa conservation.
-
-## Override groupe
-
-Permet de modifier temporairement le comportement de toutes les vannes d'un groupe.
-
-Exemple :
-
-```text
-Sous-sol
-Override = 15 °C
-```
-
-L'override doit pouvoir être supprimé pour revenir au fonctionnement automatique.
-
----
-
-# 9. Hiérarchie logique cible
-
-Lorsqu'elle est implémentée, la logique doit rester explicite.
-
-Une hiérarchie possible est :
-
-```text
-Override individuel
-        ↓
-Override groupe
-        ↓
-Consigne automatique du groupe
-        ↓
-Consigne normale de la vanne
-```
-
-Cette hiérarchie doit toutefois être vérifiée dans la configuration réelle avant toute modification.
-
-Codex ne doit pas considérer ce schéma comme nécessairement déjà implémenté.
-
----
-
-# 10. Interface utilisateur
-
-L'utilisation principale est sur smartphone en mode portrait.
-
-Les principes d'interface sont :
-
-* affichage compact ;
-* lisibilité immédiate ;
-* actions principales visibles sans ouvrir plusieurs sous-menus ;
-* température affichée avec virgule lorsque possible ;
-* cohérence avec les cartes Mushroom ;
-* distinction claire entre fonctionnement automatique et override.
-
-Une ancienne vue appelée **Chauffage** a servi de vue de test.
-
-Elle ne doit pas être considérée automatiquement comme l'architecture UI définitive.
-
----
-
-# 11. Intégration avec la PAC
-
-La PAC et Heat Manager constituent deux niveaux différents.
-
-```text
-PAC + Navilink
-        ↓
-température de l'eau / chauffage central
-
-Heat Manager
-        ↓
-débit autorisé dans chaque radiateur équipé
-```
-
-Une vanne TRVZB fermée réduit ou coupe le débit dans son radiateur.
-
-Une vanne ouverte ne garantit pas que le radiateur chauffe.
-
-Il faut également que :
-
-* la PAC soit en fonctionnement ;
-* le circuit fournisse de l'eau suffisamment chaude ;
-* le débit hydraulique soit disponible.
-
----
-
-# 12. Limitation fondamentale
-
-Heat Manager ne connaît pas nécessairement directement la demande de chaleur de toutes les pièces du point de vue de la PAC.
-
-Exemple :
-
-```text
-Salon = 19 °C
-Navilink satisfait
-
-Chambre = 17 °C
-TRVZB demande 20 °C
-```
-
-Il est possible que la vanne de la chambre reste ouverte sans que la PAC continue à produire suffisamment de chaleur si la logique Navilink considère que la demande principale est satisfaite.
-
-Ce point doit être conservé à l'esprit lors du diagnostic de comportements Heat Manager.
-
----
-
-# 13. Architecture Home Assistant
-
-Les éléments Heat Manager peuvent être répartis entre plusieurs types de configuration :
-
-```text
-helpers
-templates
-groups
-scripts
-automations
-dashboard
-```
-
-Avant toute modification, rechercher les références réelles dans le repository.
-
-Ne pas supposer l'emplacement d'une fonction à partir de son nom.
-
----
-
-# 14. Tests
-
-Un test simple déjà utilisé dans le projet concerne le groupe :
-
-**Buanderie**
-
-La buanderie peut servir de groupe pilote pour tester :
-
-* changement de température ;
-* mode ;
-* override ;
-* retour automatique.
-
-Lorsqu'un test peut être réalisé sur une seule vanne ou un seul groupe, préférer ce test à une modification globale.
-
----
-
-# 15. Principes d'évolution
-
-Toute évolution Heat Manager doit respecter les règles suivantes :
-
-1. modification minimale ;
-2. fonctionnalité testable isolément ;
-3. absence de dépendance inutile ;
-4. comportement observable dans Home Assistant ;
-5. possibilité de revenir facilement à la configuration précédente.
-
----
-
-# 16. Documentation
-
-Lorsqu'une évolution modifie :
-
-* un groupe ;
-* une hiérarchie d'override ;
-* un helper ;
-* une automatisation centrale ;
-* l'architecture générale ;
-
-mettre à jour ce document.
-
-Les problèmes ponctuels, bugs et actions restantes doivent être consignés dans :
-
-```text
-docs/AUDIT_HEAT_MANAGER.md
-```
+Les intégrations, ressources Lovelace, registre des entités, états restaurés et automatisations réellement actives sont extérieurs à ce dépôt. Cette cartographie ne confirme ni leur présence ni leur configuration. Le cadrage de la suite est consigné dans [AUDIT_HEAT_MANAGER.md](AUDIT_HEAT_MANAGER.md).
