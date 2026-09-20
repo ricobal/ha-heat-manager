@@ -43,6 +43,7 @@ Le fichier Lovelace est généré. Modifiez le générateur puis relancez-le au 
 
 - Home Assistant avec prise en charge des vues Sections ;
 - Mushroom installé par HACS ;
+- card-mod installé par HACS et enregistré comme ressource Lovelace ;
 - Zigbee2MQTT et les 13 vannes SONOFF TRVZB ;
 - composant personnalisé [Atlantic Alféa M](https://github.com/ricobal/ha-alfea-m), version `0.1.0` ou ultérieure ;
 - inclusion des packages Home Assistant :
