@@ -748,6 +748,7 @@ script:
       - variables:
           mode_maison: "{{ states('input_select.chauffage_mode_maison') }}"
           toutes_vannes: [climate.radiateur_chambre_julie, climate.radiateur_chambre_pablo, climate.radiateur_grande_chambre_amis, climate.radiateur_petite_chambre_amis, climate.radiateur_chambre_mathias, climate.radiateur_sdb_garcons, climate.radiateur_sdb_julie, climate.radiateur_parents, climate.radiateur_dressing, climate.radiateur_sdb_parents, climate.radiateur_atelier, climate.radiateur_salle_cine, climate.radiateur_buanderie]
+          toutes_durees_temporaires: [number.radiateur_chambre_julie_temporary_mode_duration, number.radiateur_chambre_pablo_temporary_mode_duration, number.radiateur_grande_chambre_amis_temporary_mode_duration, number.radiateur_petite_chambre_amis_temporary_mode_duration, number.radiateur_chambre_mathias_temporary_mode_duration, number.radiateur_sdb_garcons_temporary_mode_duration, number.radiateur_sdb_julie_temporary_mode_duration, number.radiateur_parents_temporary_mode_duration, number.radiateur_dressing_temporary_mode_duration, number.radiateur_sdb_parents_temporary_mode_duration, number.radiateur_atelier_temporary_mode_duration, number.radiateur_salle_cine_temporary_mode_duration, number.radiateur_buanderie_temporary_mode_duration]
           temperatures:
             Confort: input_number.chauffage_profil_confort
             Nuit: input_number.chauffage_profil_nuit
@@ -776,6 +777,18 @@ script:
                   hvac_mode: auto
           - conditions: "{{ mode_maison == 'Arrêt' }}"
             sequence:
+              # Un boost SONOFF reste prioritaire même si system_mode vaut off.
+              # Il faut donc l'annuler, rétablir la consigne de repos, puis arrêter.
+              - action: number.set_value
+                target:
+                  entity_id: "{{ toutes_durees_temporaires }}"
+                data:
+                  value: 0
+              - action: climate.set_temperature
+                target:
+                  entity_id: "{{ toutes_vannes }}"
+                data:
+                  temperature: 7
               - action: climate.set_hvac_mode
                 target:
                   entity_id: "{{ toutes_vannes }}"
