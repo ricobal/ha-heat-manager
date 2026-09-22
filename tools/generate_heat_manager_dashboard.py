@@ -28,7 +28,10 @@ ABSENCE_START = "datetime.atlantic_alfea_m_duo_debut_absence"
 ABSENCE_END = "datetime.atlantic_alfea_m_duo_fin_absence"
 ECS_AUTOMATION = "automation.gestion_eau_chaude_alfea_heures_creuses"
 
+ACTIVE_ORANGE = "rgb(194, 75, 0)"
+ACTIVE_BLUE = "rgb(21, 101, 192)"
 FULL_WIDTH = {"columns": "full", "rows": "auto"}
+HALF_WIDTH = {"columns": 6, "rows": "auto"}
 NAVIGATION_CARD_STYLE = """ha-card {
   border: 1px solid var(--divider-color);
   border-radius: 16px;
@@ -39,13 +42,7 @@ ha-state-icon {
   --mdc-icon-size: 24px;
 }
 """
-NAVIGATION_BAR_STYLE = """ha-card {
-  border: 1px solid var(--divider-color);
-  border-radius: 16px;
-  box-shadow: none;
-  padding: 6px 10px;
-}
-"""
+TALL_NAVIGATION_CARD_STYLE = NAVIGATION_CARD_STYLE.replace("min-height: 72px", "min-height: 96px")
 
 
 ROOMS = {
@@ -201,28 +198,64 @@ def title_card(title: str, subtitle: str | None = None) -> dict[str, Any]:
     return card
 
 
-def full_width(card: dict[str, Any], styled: bool = False) -> dict[str, Any]:
-    """Make a Sections card occupy the complete mobile content width."""
+def full_width(
+    card: dict[str, Any],
+    styled: bool = False,
+    active_condition: str | None = None,
+    active_background: str = ACTIVE_ORANGE,
+) -> dict[str, Any]:
+    """Make a Sections card occupy the complete mobile content width.
+
+    When `active_condition` (a Jinja expression) is given, the card gets a coloured
+    background while the condition is true.
+    """
     result = dict(card)
     result["grid_options"] = FULL_WIDTH
-    if styled:
-        result["card_mod"] = {"style": NAVIGATION_CARD_STYLE}
+    if styled or active_condition:
+        style = NAVIGATION_CARD_STYLE
+        if active_condition:
+            style = style.replace(
+                "  min-height: 72px;\n",
+                "  min-height: 72px;\n" + _active_css(active_condition, active_background),
+            )
+        result["card_mod"] = {"style": style}
     return result
 
 
-def navigation_bar() -> dict[str, Any]:
-    return full_width(
-        {
-            "type": "custom:mushroom-chips-card",
-            "alignment": "justify",
-            "chips": [
-                action_chip("Maison", "mdi:home-outline", nav("chauffage-v2"), "cyan"),
-                action_chip("Zones", "mdi:view-grid-outline", nav("chauffage-v2")),
-                action_chip("Système", "mdi:cog-outline", nav("chauffage-parametres")),
-            ],
-            "card_mod": {"style": NAVIGATION_BAR_STYLE},
-        }
+def _active_css(condition: str, background: str) -> str:
+    return (
+        "  {% if " + condition + " %}\n"
+        f"  background: {background};\n"
+        "  --primary-text-color: white;\n"
+        "  --secondary-text-color: rgba(255, 255, 255, 0.85);\n"
+        "  --card-primary-color: white;\n"
+        "  --card-secondary-color: rgba(255, 255, 255, 0.85);\n"
+        "  {% endif %}\n"
     )
+
+
+def half_width(card: dict[str, Any], active_condition: str | None = None) -> dict[str, Any]:
+    """Make a Sections card occupy half the width (two cards side by side), taller than the default.
+
+    When `active_condition` (a Jinja expression) is given, the card gets the orange "Marche"
+    background of the heat pump view while the condition is true.
+    """
+    result = dict(card)
+    result["grid_options"] = HALF_WIDTH
+    style = TALL_NAVIGATION_CARD_STYLE
+    if active_condition:
+        active_css = (
+            "  {% if " + active_condition + " %}\n"
+            "  background: rgb(194, 75, 0);\n"
+            "  --primary-text-color: white;\n"
+            "  --secondary-text-color: rgba(255, 255, 255, 0.85);\n"
+            "  --card-primary-color: white;\n"
+            "  --card-secondary-color: rgba(255, 255, 255, 0.85);\n"
+            "  {% endif %}\n"
+        )
+        style = style.replace("  min-height: 96px;\n", "  min-height: 96px;\n" + active_css)
+    result["card_mod"] = {"style": style}
+    return result
 
 
 def action_chip(label: str, icon: str, tap_action: dict[str, Any], color: str | None = None) -> dict[str, Any]:
@@ -336,106 +369,182 @@ def make_view(title: str, path: str, cards: list[dict[str, Any]], back: str | No
     return result
 
 
-def pac_mode_chips() -> dict[str, Any]:
-    chips = []
-    for label, mode, icon, color in (
-        ("Auto", "auto", "mdi:autorenew", "cyan"),
-        ("Marche", "heat", "mdi:fire", "deep-orange"),
-        ("Arrêt", "off", "mdi:power", "grey"),
-    ):
-        action = perform("climate.set_hvac_mode", {"hvac_mode": mode})
-        action["target"] = {"entity_id": PAC_CLIMATE}
-        chips.append(action_chip(label, icon, action, "{{ '" + color + "' if is_state('" + PAC_CLIMATE + "', '" + mode + "') else 'disabled' }}"))
-    return {"type": "custom:mushroom-chips-card", "alignment": "justify", "chips": chips}
+SETPOINT_STYLE = "ha-card { border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; }"
+SETPOINT_TOP_STYLE = "ha-card { border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; border-bottom: none; border-radius: 12px 12px 0 0; background: rgba(0, 188, 212, 0.07); box-shadow: none; }"
+SETPOINT_BOTTOM_STYLE = "ha-card { border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; border-top: none; border-radius: 0 0 12px 12px; background: rgba(0, 188, 212, 0.07); box-shadow: none; margin-top: -8px; }"
+
+
+ABSENCE_PANEL = "input_boolean.chauffage_panneau_absence_pac"
+
+
+def pac_level1_buttons() -> dict[str, Any]:
+    """Marche / Absence / Arrêt de la PAC. Absence ouvre ou ferme le panneau des dates."""
+    grid = hvac_mode_buttons(PAC_CLIMATE, (
+        ("Marche", "heat", "mdi:fire", "194, 75, 0"),
+        ("Absence", "absence", "mdi:home-export-outline", "21, 101, 192"),
+        ("Arrêt", "off", "mdi:power", "85, 99, 112"),
+    ))
+    absence = grid["cards"][1]
+    active = "is_state('" + ABSENCE_SWITCH + "', 'on')"
+    # Pendant une absence, la PAC reste en « off » : seul le bouton Absence doit être allumé.
+    for button, mode in ((grid["cards"][0], "heat"), (grid["cards"][2], "off")):
+        # Le script désactive d'abord une absence en cours.
+        button["tap_action"] = perform("script.chauffage_pac_mode", {"mode": mode})
+        condition = "is_state('" + PAC_CLIMATE + "', '" + mode + "')"
+        button["card_mod"]["style"] = button["card_mod"]["style"].replace(condition, "(" + condition + " and not " + active + ")")
+    absence["entity"] = ABSENCE_SWITCH
+    absence["tap_action"] = perform("input_boolean.toggle")
+    absence["tap_action"]["target"] = {"entity_id": ABSENCE_PANEL}
+    absence["card_mod"]["style"] = (
+        absence["card_mod"]["style"]
+        .replace("is_state('" + PAC_CLIMATE + "', 'absence')", active)
+        .removesuffix("}")
+        + "{% if is_state('" + ABSENCE_PANEL + "', 'on') %}border: 2px solid rgb(21, 101, 192); {% endif %}}"
+    )
+    return grid
+
+
+def absence_entities() -> list[dict[str, Any]]:
+    return [
+        {"entity": "sensor.atlantic_alfea_m_duo_absence", "name": "État"},
+        {"entity": ABSENCE_START, "name": "Début"},
+        {"entity": ABSENCE_END, "name": "Fin"},
+        {"entity": ABSENCE_SWITCH, "name": "Activer l’absence"},
+    ]
+
+
+def absence_panel() -> dict[str, Any]:
+    close = perform("input_boolean.turn_off")
+    close["target"] = {"entity_id": ABSENCE_PANEL}
+    return {
+        "type": "conditional",
+        "conditions": [{"condition": "state", "entity": ABSENCE_PANEL, "state": "on"}],
+        "card": {
+            "type": "entities", "title": "Absence de la PAC", "show_header_toggle": False,
+            "entities": absence_entities() + [
+                {"type": "button", "name": "Fermer le panneau", "icon": "mdi:close", "action_name": "Fermer", "tap_action": close},
+            ],
+            "card_mod": {"style": "ha-card { border: 1px solid rgba(21, 101, 192, 0.6); border-left: 4px solid rgb(21, 101, 192); box-shadow: none; }"},
+        },
+    }
+
+
+def pac_setpoint_card() -> dict[str, Any]:
+    return {"type": "vertical-stack", "cards": [
+        {"type": "custom:mushroom-template-card", "entity": PAC_SETPOINT, "primary": "Consigne générale", "secondary": "Température actuelle = {{ states('" + PAC_THERMOSTAT + "') | replace('.', ',') }} °C", "icon": "mdi:thermostat", "icon_color": "cyan", "tap_action": {"action": "more-info"}, "hold_action": {"action": "none"}, "card_mod": {"style": SETPOINT_TOP_STYLE}},
+        {"type": "custom:mushroom-number-card", "entity": PAC_SETPOINT, "display_mode": "buttons", "primary_info": "none", "secondary_info": "none", "icon_type": "none", "card_mod": {"style": SETPOINT_BOTTOM_STYLE}},
+    ]}
+
+
+def pac_info_cards() -> list[dict[str, Any]]:
+    return [
+        {"type": "horizontal-stack", "cards": [
+            {"type": "custom:mushroom-template-card", "entity": PAC_THERMOSTAT, "primary": "{{ states('" + PAC_THERMOSTAT + "') }} °C", "secondary": "Temp. intérieure", "icon": "mdi:home-thermometer-outline"},
+            {"type": "custom:mushroom-template-card", "entity": PAC_OUTDOOR, "primary": "{{ states('" + PAC_OUTDOOR + "') }} °C", "secondary": "Temp. extérieure", "icon": "mdi:thermometer"},
+        ]},
+        {"type": "custom:mushroom-template-card", "primary": "État technique", "secondary": "Pression et températures", "icon": "mdi:gauge", "tap_action": nav("chauffage-pac-technique")},
+    ]
+
+
+def trv_mode_buttons(entity: str) -> dict[str, Any]:
+    return hvac_mode_buttons(entity, (
+        ("Auto", "auto", "mdi:thermostat-auto", "0, 131, 143"),
+        ("Manuel", "heat", "mdi:fire", "194, 75, 0"),
+        ("Arrêt", "off", "mdi:power", "85, 99, 112"),
+    ))
+
+
+def house_mode_buttons() -> dict[str, Any]:
+    return hvac_mode_buttons("input_select.chauffage_mode_maison", (
+        ("Auto", "Auto", "mdi:thermostat-auto", "0, 131, 143"),
+        ("Absence", "Absence", "mdi:home-export-outline", "21, 101, 192"),
+        ("Arrêt", "Arrêt", "mdi:power", "85, 99, 112"),
+    ), service=("input_select.select_option", "option"))
+
+
+def hvac_mode_buttons(
+    entity: str,
+    modes: tuple[tuple[str, str, str, str], ...],
+    service: tuple[str, str] = ("climate.set_hvac_mode", "hvac_mode"),
+) -> dict[str, Any]:
+    buttons = []
+    for index, (label, mode, icon, rgb) in enumerate(modes):
+        radius = "14px 0 0 14px" if index == 0 else "0 14px 14px 0" if index == len(modes) - 1 else "0"
+        action = perform(service[0], {service[1]: mode})
+        action["target"] = {"entity_id": entity}
+        active = "is_state('" + entity + "', '" + mode + "')"
+        buttons.append({
+            "type": "button", "entity": entity, "name": label, "icon": icon,
+            "show_state": False, "icon_height": "24px",
+            "tap_action": action, "hold_action": {"action": "none"},
+            "card_mod": {"style": (
+                "ha-card { height: 76px; border-radius: " + radius + "; "
+                "box-shadow: none; border: 1px solid var(--divider-color); "
+                "background: {{ 'rgb(" + rgb + ")' if " + active + " else 'var(--card-background-color)' }}; "
+                "color: {{ 'white' if " + active + " else 'var(--primary-text-color)' }}; "
+                "--state-icon-color: {{ 'white' if " + active + " else 'var(--secondary-text-color)' }}; "
+                "--state-icon-active-color: {{ 'white' if " + active + " else 'var(--secondary-text-color)' }}; }"
+            )},
+        })
+    return {
+        "type": "grid", "columns": len(buttons), "square": False, "cards": buttons,
+        "card_mod": {"style": "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"},
+    }
 
 
 def global_view() -> dict[str, Any]:
     demand = "binary_sensor.chauffage_demande_chauffage"
-    cards: list[dict[str, Any]] = [
-        full_width(title_card("Chauffage", "Niveau 1 · Vue globale")),
-        full_width({
-            "type": "custom:mushroom-chips-card",
-            "alignment": "end",
-            "chips": [action_chip("Paramètres", "mdi:cog-outline", nav("chauffage-parametres"))],
-        }),
-        full_width({
-            "type": "custom:mushroom-template-card",
-            "entity": PAC_CLIMATE,
-            "primary": "Pompe à chaleur",
-            "secondary": "{{ {'auto':'Auto','heat':'En marche','off':'Arrêt'}.get(states('" + PAC_CLIMATE + "'), states('" + PAC_CLIMATE + "') | title) }} · consigne {{ states('" + PAC_SETPOINT + "') }} °C · ambiance {{ states('" + PAC_THERMOSTAT + "') }} °C",
-            "icon": "mdi:heat-pump",
-            "icon_color": "{{ 'deep-orange' if not is_state('" + PAC_CLIMATE + "', 'off') else 'disabled' }}",
-            "badge_icon": "{{ 'mdi:fire' if not is_state('" + PAC_CLIMATE + "', 'off') else 'mdi:power-standby' }}",
-            "badge_color": "{{ 'deep-orange' if not is_state('" + PAC_CLIMATE + "', 'off') else 'grey' }}",
-            "tap_action": nav("chauffage-pac"),
-            "multiline_secondary": True,
-        }, styled=True),
-        full_width({
+    ecs_card = half_width({
             "type": "custom:mushroom-template-card",
             "entity": ECS_TEMPERATURE,
             "primary": "Eau chaude",
             "secondary": "{{ states('" + ECS_TEMPERATURE + "') }} °C · {{ 'autorisée' if is_state('" + ECS_SWITCH + "', 'on') else 'désactivée' }} · cycle {{ 'actif' if is_state('" + ECS_CYCLE + "', 'on') else 'inactif' }}",
             "icon": "mdi:water-boiler",
-            "icon_color": "{{ 'deep-orange' if is_state('" + ECS_CYCLE + "', 'on') else 'cyan' }}",
+            "icon_color": "{{ '#ff6f22' if is_state('" + ECS_CYCLE + "', 'on') else 'cyan' }}",
             "badge_icon": "{{ 'mdi:fire' if is_state('" + ECS_CYCLE + "', 'on') else 'mdi:clock-outline' }}",
             "badge_color": "{{ 'deep-orange' if is_state('" + ECS_CYCLE + "', 'on') else 'grey' }}",
             "tap_action": nav("chauffage-ecs"),
             "multiline_secondary": True,
-        }, styled=True),
-        full_width({
-            "type": "custom:mushroom-template-card",
-            "entity": ABSENCE_SWITCH,
-            "primary": "Absence",
-            "secondary": "{{ states('sensor.atlantic_alfea_m_duo_absence') }}{% if is_state('" + ABSENCE_SWITCH + "', 'on') %} · jusqu’au {{ states('" + ABSENCE_END + "') }}{% endif %}",
-            "icon": "mdi:home-export-outline",
-            "icon_color": "{{ 'cyan' if is_state('" + ABSENCE_SWITCH + "', 'on') else 'disabled' }}",
-            "badge_icon": "mdi:chevron-right",
-            "badge_color": "grey",
-            "tap_action": nav("chauffage-absence"),
-        }, styled=True),
-        full_width({
-            "type": "custom:mushroom-template-card",
-            "entity": demand,
-            "primary": "Vannes thermostatiques · {{ states('input_select.chauffage_mode_maison') }}",
-            "secondary": "{{ state_attr('" + demand + "', 'nombre_pieces_en_demande') | int(0) }} pièces demandent du chauffage · écart max. {{ state_attr('" + demand + "', 'ecart_maximum') | float(0) }} °C",
-            "icon": "mdi:radiator",
-            "icon_color": "{{ 'deep-orange' if is_state('" + demand + "', 'on') else 'disabled' }}",
-            "badge_icon": "{{ 'mdi:fire-alert' if state_attr('" + demand + "', 'nombre_pieces_forte_demande') | int(0) > 0 else 'mdi:chevron-right' }}",
-            "badge_color": "{{ 'deep-orange' if state_attr('" + demand + "', 'nombre_pieces_forte_demande') | int(0) > 0 else 'grey' }}",
-            "tap_action": nav("chauffage-parametres"),
-            "multiline_secondary": True,
-        }, styled=True),
-        full_width(title_card("Zones", "Synthèse uniquement · commandes dans chaque pièce")),
+        }, active_condition="is_state('" + ECS_CYCLE + "', 'on')")
+    temperatures, technical = pac_info_cards()
+    cards: list[dict[str, Any]] = [
+        full_width(title_card("PAC")),
+        full_width(pac_level1_buttons()),
+        full_width(absence_panel()),
+        # La consigne générale n'est utile que PAC en marche.
+        full_width({"type": "conditional", "conditions": [{"condition": "state", "entity": PAC_CLIMATE, "state": "heat"}], "card": pac_setpoint_card()}),
+        full_width(temperatures),
+        # Eau chaude et état technique côte à côte, même hauteur.
+        ecs_card,
+        half_width(technical),
+        full_width(title_card("Vannes thermostatiques")),
+        # Sous-titre et bouton Paramètres sur une même ligne (8 + 4 colonnes).
+        # Marges négatives : rapproche cette ligne du titre « Vannes thermostatiques ».
+        {**title_card("", "Contrôle de toutes les vannes"), "card_mod": {"style": "ha-card { margin-top: -16px; }"}, "grid_options": {"columns": 8, "rows": "auto"}},
+        {
+            "type": "custom:mushroom-chips-card",
+            "alignment": "end",
+            "chips": [action_chip("Paramètres", "mdi:cog-outline", nav("chauffage-parametres"))],
+            "card_mod": {"style": "ha-card { margin-top: -6px; }"},
+            "grid_options": {"columns": 4, "rows": "auto"},
+        },
+        full_width(house_mode_buttons()),
+        full_width(title_card("", "Contrôles par pièce")),
     ]
     cards.extend(full_width(zone_card(zone), styled=True) for zone in ZONES)
-    cards.append(navigation_bar())
+    cards.append(full_width({
+        "type": "custom:mushroom-template-card",
+        "entity": demand,
+        "primary": "Vannes thermostatiques · {{ states('input_select.chauffage_mode_maison') }}",
+        "secondary": "{{ state_attr('" + demand + "', 'nombre_pieces_en_demande') | int(0) }} pièces demandent du chauffage · écart max. {{ state_attr('" + demand + "', 'ecart_maximum') | float(0) }} °C",
+        "icon": "mdi:radiator",
+        "icon_color": "{{ 'deep-orange' if is_state('" + demand + "', 'on') else 'disabled' }}",
+        "badge_icon": "{{ 'mdi:fire-alert' if state_attr('" + demand + "', 'nombre_pieces_forte_demande') | int(0) > 0 else 'mdi:chevron-right' }}",
+        "badge_color": "{{ 'deep-orange' if state_attr('" + demand + "', 'nombre_pieces_forte_demande') | int(0) > 0 else 'grey' }}",
+        "tap_action": nav("chauffage-parametres"),
+        "multiline_secondary": True,
+    }, styled=True))
     return make_view("Chauffage", "chauffage-v2", cards, icon="mdi:radiator")
-
-
-def pac_view() -> dict[str, Any]:
-    cards = [
-        title_card("Chauffage", "Commandes générales de la pompe à chaleur"),
-        pac_mode_chips(),
-        {"type": "custom:mushroom-number-card", "entity": PAC_SETPOINT, "name": "Consigne générale", "icon": "mdi:thermostat", "display_mode": "buttons"},
-        {"type": "horizontal-stack", "cards": [
-            {"type": "custom:mushroom-template-card", "entity": PAC_THERMOSTAT, "primary": "{{ states('" + PAC_THERMOSTAT + "') }} °C", "secondary": "Thermostat Z1", "icon": "mdi:home-thermometer-outline"},
-            {"type": "custom:mushroom-template-card", "entity": PAC_OUTDOOR, "primary": "{{ states('" + PAC_OUTDOOR + "') }} °C", "secondary": "Extérieur", "icon": "mdi:thermometer"},
-        ]},
-        {"type": "custom:mushroom-template-card", "primary": "Planning chauffage global", "secondary": "Programme utilisé en mode Auto", "icon": "mdi:calendar-clock", "tap_action": nav("chauffage-pac-planning")},
-        {"type": "custom:mushroom-template-card", "primary": "État technique", "secondary": "Pression et températures", "icon": "mdi:gauge", "tap_action": nav("chauffage-pac-technique")},
-    ]
-    return make_view("Pompe à chaleur", "chauffage-pac", cards, "chauffage-v2")
-
-
-def pac_schedule_view() -> dict[str, Any]:
-    days = [("lundi", "Lundi"), ("mardi", "Mardi"), ("mercredi", "Mercredi"), ("jeudi", "Jeudi"), ("vendredi", "Vendredi"), ("samedi", "Samedi"), ("dimanche", "Dimanche")]
-    entities = [{"entity": f"sensor.atlantic_alfea_m_duo_{slug}_programme_chauffage", "name": name} for slug, name in days]
-    cards = [
-        title_card("Planning chauffage global", "Programme lu depuis l’Alféa M"),
-        {"type": "entities", "show_header_toggle": False, "entities": entities},
-        {"type": "markdown", "content": "**Écriture non disponible actuellement.** Les intégrations Alféa M et Cozytouch exposent ces programmes en lecture, sans action d’écriture. Une future version du composant devra ajouter un service dédié avant d’afficher un bouton Enregistrer."},
-    ]
-    return make_view("Planning chauffage", "chauffage-pac-planning", cards, "chauffage-pac")
 
 
 def ecs_view() -> dict[str, Any]:
@@ -471,19 +580,6 @@ def ecs_history_view() -> dict[str, Any]:
     return make_view("Historique ECS", "chauffage-ecs-historique", cards, "chauffage-ecs")
 
 
-def absence_view() -> dict[str, Any]:
-    cards = [
-        title_card("Absence", "Période globale transmise à l’Alféa M"),
-        {"type": "entities", "show_header_toggle": False, "entities": [
-            {"entity": "sensor.atlantic_alfea_m_duo_absence", "name": "État"},
-            {"entity": ABSENCE_START, "name": "Début"},
-            {"entity": ABSENCE_END, "name": "Fin"},
-            {"entity": ABSENCE_SWITCH, "name": "Activer l’absence"},
-        ]},
-    ]
-    return make_view("Absence", "chauffage-absence", cards, "chauffage-v2")
-
-
 def technical_view() -> dict[str, Any]:
     cards = [
         title_card("État technique", "Mesures principales de la pompe à chaleur"),
@@ -496,7 +592,7 @@ def technical_view() -> dict[str, Any]:
         ]},
         {"type": "custom:mushroom-template-card", "primary": "Diagnostic et consommations", "secondary": "Connexion, Wi-Fi, compteurs et identification", "icon": "mdi:dots-horizontal-circle-outline", "tap_action": nav("chauffage-pac-diagnostic")},
     ]
-    return make_view("État technique", "chauffage-pac-technique", cards, "chauffage-pac")
+    return make_view("État technique", "chauffage-pac-technique", cards, "chauffage-v2")
 
 
 def diagnostics_view() -> dict[str, Any]:
@@ -530,13 +626,76 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
     cards: list[dict[str, Any]] = [
         title_card(room["title"]),
         {
-            "type": "custom:mushroom-climate-card",
-            "entity": entity,
-            "name": room["title"],
-            "icon": room["icon"],
-            "show_temperature_control": True,
-            "collapsible_controls": False,
-            "hvac_modes": ["off", "heat", "auto"],
+            "type": "conditional",
+            "conditions": [{"condition": "state", "entity": "input_select.chauffage_mode_maison", "state": "Absence"}],
+            "card": {
+                "type": "custom:mushroom-template-card",
+                "entity": "input_select.chauffage_mode_maison",
+                "primary": "Absence maison : {{ states('input_number.chauffage_profil_absence') | replace('.', ',') }} °C imposés",
+                "secondary": "Chaque vanne retrouvera son mode d’avant l’absence au retour",
+                "icon": "mdi:home-export-outline",
+                "icon_color": "white",
+                "multiline_secondary": True,
+                "tap_action": {"action": "none"},
+                "hold_action": {"action": "none"},
+                "card_mod": {"style": "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"},
+            },
+        },
+        title_card("", "COMMANDES"),
+        trv_mode_buttons(entity),
+        # La TRVZB quitte le planning si sa consigne change en Auto : réglage réservé au mode Manuel.
+        {
+            "type": "conditional",
+            "conditions": [{"condition": "state", "entity": entity, "state": "heat"}],
+            # Mushroom impose « mode · température » sous le nom : en-tête séparé + commandes seules.
+            "card": {"type": "vertical-stack", "cards": [
+                {
+                    "type": "custom:mushroom-template-card",
+                    "entity": entity,
+                    "primary": "Consigne",
+                    "secondary": "Température actuelle : {{ state_attr('" + entity + "', 'current_temperature') | string | replace('.', ',') }} °C",
+                    "icon": "mdi:thermostat",
+                    "icon_color": "{{ 'deep-orange' if state_attr('" + entity + "', 'hvac_action') == 'heating' else 'cyan' }}",
+                    "tap_action": {"action": "more-info"},
+                    "hold_action": {"action": "none"},
+                    "card_mod": {"style": SETPOINT_TOP_STYLE},
+                },
+                {
+                    "type": "custom:mushroom-climate-card",
+                    "entity": entity,
+                    "primary_info": "none",
+                    "secondary_info": "none",
+                    "icon_type": "none",
+                    "show_temperature_control": True,
+                    "collapsible_controls": False,
+                    "card_mod": {"style": SETPOINT_BOTTOM_STYLE},
+                },
+            ]},
+        },
+        {
+            "type": "conditional",
+            "conditions": [{"condition": "state", "entity": entity, "state": "auto"}],
+            "card": {
+                "type": "custom:mushroom-template-card",
+                "entity": entity,
+                "primary": "Consigne de planning : {{ state_attr('" + entity + "', 'temperature') | string | replace('.', ',') }} °C",
+                "secondary": (
+                    "Température actuelle : {{ state_attr('" + entity + "', 'current_temperature') | string | replace('.', ',') }} °C\n"
+                    "{% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}"
+                    "{% set p = states('text." + room["base"] + "_weekly_schedule_' ~ j) %}"
+                    "{% set ns = namespace(out=[], last='') %}"
+                    "{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}"
+                    "{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}"
+                    "{% endif %}{% set ns.last = t %}{% endfor %}"
+                    "Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}"
+                ),
+                "icon": "mdi:calendar-clock",
+                "icon_color": "cyan",
+                "multiline_secondary": True,
+                "tap_action": {"action": "none"},
+                "hold_action": {"action": "none"},
+                "card_mod": {"style": SETPOINT_STYLE},
+            },
         },
         {
             "type": "custom:mushroom-template-card",
@@ -568,20 +727,19 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
 def planning_view(title: str, path: str, target: str, planning_slug: str, parent_path: str) -> dict[str, Any]:
     entities = [
         {"entity": f"input_text.chauffage_planning_{planning_slug}_semaine", "name": "Semaine"},
-        {"entity": f"input_text.chauffage_planning_{planning_slug}_samedi", "name": "Samedi"},
-        {"entity": f"input_text.chauffage_planning_{planning_slug}_dimanche", "name": "Dimanche"},
+        {"entity": f"input_text.chauffage_planning_{planning_slug}_weekend", "name": "Week-end"},
     ]
     cards: list[dict[str, Any]] = [
-        title_card(f"Planning · {title}", "Six changements requis par type de journée"),
+        title_card(f"Planning · {title}", "1 à 6 changements, le premier à 00:00"),
         {
             "type": "markdown",
-            "content": "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17`.",
+            "content": "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 22:30/17`.",
         },
         {"type": "entities", "show_header_toggle": False, "entities": entities},
         {
             "type": "custom:mushroom-template-card",
-            "primary": "Enregistrer et appliquer",
-            "secondary": "Copie le planning vers les vannes puis active Auto",
+            "primary": "Enregistrer",
+            "secondary": "Copie le planning vers la vanne sans changer son mode",
             "icon": "mdi:calendar-check",
             "icon_color": "cyan",
             "tap_action": perform("script.chauffage_appliquer_planning_cible", {"cible": target}),
@@ -599,12 +757,10 @@ def planning_view(title: str, path: str, target: str, planning_slug: str, parent
 
 def settings_view() -> dict[str, Any]:
     cards: list[dict[str, Any]] = [
-        title_card("Paramètres chauffage", "Valeurs conservées après redémarrage"),
+        title_card("Paramètres Vannes", "Valeurs conservées après redémarrage"),
         title_card("Profils maison"),
     ]
     for entity, name, icon in (
-        ("input_number.chauffage_profil_confort", "Confort", "mdi:home-thermometer"),
-        ("input_number.chauffage_profil_nuit", "Nuit", "mdi:weather-night"),
         ("input_number.chauffage_profil_absence", "Absence", "mdi:home-export-outline"),
         ("input_number.chauffage_duree_boost", "Durée du boost", "mdi:timer-outline"),
     ):
@@ -642,7 +798,8 @@ def dump_yaml(value: Any, indent: int = 0) -> list[str]:
                 lines.append(f"{prefix}{key}:")
                 lines.extend(dump_yaml(item, indent + 2))
             elif isinstance(item, str) and "\n" in item:
-                lines.append(f"{prefix}{key}: >-")
+                # Bloc littéral : les retours à la ligne sont conservés (markdown, Jinja).
+                lines.append(f"{prefix}{key}: |-")
                 lines.extend(f"{' ' * (indent + 2)}{line}" for line in item.splitlines())
             else:
                 lines.append(f"{prefix}{key}: {scalar(item)}")
@@ -652,7 +809,7 @@ def dump_yaml(value: Any, indent: int = 0) -> list[str]:
                 lines.append(f"{prefix}-")
                 lines.extend(dump_yaml(item, indent + 2))
             elif isinstance(item, str) and "\n" in item:
-                lines.append(f"{prefix}- >-")
+                lines.append(f"{prefix}- |-")
                 lines.extend(f"{' ' * (indent + 2)}{line}" for line in item.splitlines())
             else:
                 lines.append(f"{prefix}- {scalar(item)}")
@@ -662,12 +819,9 @@ def dump_yaml(value: Any, indent: int = 0) -> list[str]:
 def build_views() -> list[dict[str, Any]]:
     views: list[dict[str, Any]] = [
         global_view(),
-        pac_view(),
-        pac_schedule_view(),
         ecs_view(),
         ecs_schedule_view(),
         ecs_history_view(),
-        absence_view(),
         technical_view(),
         diagnostics_view(),
         settings_view(),

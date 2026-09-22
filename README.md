@@ -13,7 +13,7 @@ Le projet est préparé pour l’installation Home Assistant décrite ci-dessous
 - historique ECS sur 72 heures avec autorisation et température de l’eau ;
 - programmation du mode absence avec dates de début et de fin ;
 - pression, températures, connexion, Wi-Fi et consommations de la PAC ;
-- mode global des 13 vannes : Auto, Confort, Nuit, Absence ou Arrêt ;
+- mode global des 13 vannes : Auto, Absence ou Arrêt ;
 - boost et planning propres à chaque pièce ;
 - synthèse des zones sans commande commune.
 
@@ -89,13 +89,13 @@ Une modification depuis Home Assistant nécessitera l’ajout et la validation d
 
 ## Plannings des vannes
 
-Chaque pièce dispose de trois champs : semaine, samedi et dimanche. Chaque champ contient exactement six changements au format Zigbee2MQTT :
+Chaque pièce dispose de deux champs : semaine et week-end. Chaque champ contient de un à six changements au format Zigbee2MQTT, le premier à 00:00 :
 
 ```text
-00:00/17 06:30/19 08:30/16 12:00/16 17:30/19 22:30/17
+00:00/17 06:30/19 22:30/17
 ```
 
-Le script valide les heures, les températures de 4 à 35 °C et les pas de 0,5 °C. Il copie ensuite le planning vers les sept jours de la vanne et active son mode Auto.
+Le script valide les heures, les températures de 4 à 35 °C et les pas de 0,5 °C. Il copie ensuite la semaine du lundi au vendredi, le week-end le samedi et le dimanche. Le mode de la vanne n’est pas modifié : le passage en Auto reste un choix de l’utilisateur.
 
 ## Développement
 
