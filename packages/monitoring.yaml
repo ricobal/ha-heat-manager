@@ -85,3 +85,35 @@ automation:
           message: "{{ state_attr('sensor.batteries_zigbee_faibles', 'appareils') | join('\n') }}"
           data:
             url: /lovelace-mobile/technique-batteries
+
+  - id: monitoring_rapport_watchman_hebdo
+    alias: Rapport Watchman hebdomadaire
+    description: Réanalyse la configuration, régénère watchman_report.txt et signale les références manquantes.
+    mode: single
+    triggers:
+      - trigger: time
+        at: "07:00:00"
+    conditions:
+      - condition: time
+        weekday: mon
+      # Une analyse pendant une coupure Zigbee compterait des appareils à tort.
+      - condition: state
+        entity_id: binary_sensor.zigbee2mqtt_bridge_connection_state
+        state: "on"
+    actions:
+      - action: watchman.report
+        data:
+          create_file: true
+          parse_config: true
+      - condition: template
+        value_template: >-
+          {{ states('sensor.watchman_missing_entities') | int(0)
+             + states('sensor.watchman_missing_actions') | int(0) > 0 }}
+      - action: notify.mobile_app_iphone_eb_14
+        data:
+          title: Watchman
+          message: >-
+            {{ states('sensor.watchman_missing_entities') }} entités et
+            {{ states('sensor.watchman_missing_actions') }} actions manquantes dans la configuration.
+          data:
+            url: /lovelace-mobile/technique-sante

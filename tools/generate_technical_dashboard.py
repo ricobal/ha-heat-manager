@@ -290,8 +290,8 @@ def sante_view():
         section("Watchman"),
         tpl("Entités", "{{ states('sensor.watchman_missing_entities') }}", "mdi:shape-outline",
             "{{ 'green' if states('sensor.watchman_missing_entities') | int(0) == 0 else 'orange' }}", entity="sensor.watchman_missing_entities", half=True),
-        tpl("Actions", "{{ states('sensor.watchman_missing_services') }}", "mdi:function-variant",
-            "{{ 'green' if states('sensor.watchman_missing_services') | int(0) == 0 else 'orange' }}", entity="sensor.watchman_missing_services", half=True),
+        tpl("Actions", "{{ states('sensor.watchman_missing_actions') }}", "mdi:function-variant",
+            "{{ 'green' if states('sensor.watchman_missing_actions') | int(0) == 0 else 'orange' }}", entity="sensor.watchman_missing_actions", half=True),
         tpl("Dernière analyse", "{{ (as_datetime(states('sensor.watchman_last_updated')) | as_local).strftime('%d/%m à %H:%M') if states('sensor.watchman_last_updated') not in ['unknown', 'unavailable'] else '—' }}",
             "mdi:magnify-scan", "grey", entity="sensor.watchman_last_updated"),
     ], icon="mdi:stethoscope")

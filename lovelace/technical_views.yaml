@@ -1171,10 +1171,10 @@ views:
           -
             type: "custom:mushroom-template-card"
             primary: "Actions"
-            secondary: "{{ states('sensor.watchman_missing_services') }}"
+            secondary: "{{ states('sensor.watchman_missing_actions') }}"
             icon: "mdi:function-variant"
-            icon_color: "{{ 'green' if states('sensor.watchman_missing_services') | int(0) == 0 else 'orange' }}"
-            entity: "sensor.watchman_missing_services"
+            icon_color: "{{ 'green' if states('sensor.watchman_missing_actions') | int(0) == 0 else 'orange' }}"
+            entity: "sensor.watchman_missing_actions"
             tap_action:
               action: "more-info"
             multiline_secondary: true
