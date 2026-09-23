@@ -30,6 +30,8 @@ ECS_AUTOMATION = "automation.gestion_eau_chaude_alfea_heures_creuses"
 
 ACTIVE_ORANGE = "rgb(194, 75, 0)"
 ACTIVE_BLUE = "rgb(21, 101, 192)"
+# Same page background as every lovelace-mobile view, so white cards stand out.
+VIEW_BACKGROUND = "#e4e9f0"
 FULL_WIDTH = {"columns": "full", "rows": "auto"}
 HALF_WIDTH = {"columns": 6, "rows": "auto"}
 NAVIGATION_CARD_STYLE = """ha-card {
@@ -352,7 +354,19 @@ def zone_card(zone: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def navigation_chips() -> dict[str, Any]:
+    """Back/home chips, same as the other lovelace-mobile pages."""
+    return {
+        "type": "custom:mushroom-chips-card",
+        "chips": [
+            {"type": "back"},
+            {"type": "action", "tap_action": {"action": "navigate", "navigation_path": f"{DASHBOARD}/0"}, "icon": "mdi:home"},
+        ],
+    }
+
+
 def make_view(title: str, path: str, cards: list[dict[str, Any]], back: str | None = None, icon: str | None = None) -> dict[str, Any]:
+    cards = [navigation_chips(), *cards]
     cards = [card if "grid_options" in card else full_width(card) for card in cards]
     result: dict[str, Any] = {
         "title": title,
@@ -360,12 +374,14 @@ def make_view(title: str, path: str, cards: list[dict[str, Any]], back: str | No
         "type": "sections",
         "max_columns": 1,
         "sections": [{"type": "grid", "cards": cards}],
+        "background": VIEW_BACKGROUND,
     }
     if icon:
         result["icon"] = icon
     if back:
-        result["subview"] = True
-        result["back_path"] = f"{DASHBOARD}/{back}"
+        # Hidden from the tab bar rather than a subview: navigation relies on the
+        # back/home chips, like the other lovelace-mobile pages.
+        result["visible"] = False
     return result
 
 

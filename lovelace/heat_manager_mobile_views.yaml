@@ -13,6 +13,20 @@ views:
         type: "grid"
         cards:
           -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "custom:mushroom-title-card"
             title: "PAC"
             grid_options:
@@ -465,6 +479,7 @@ views:
                 ha-state-icon {
                   --mdc-icon-size: 24px;
                 }
+    background: "#e4e9f0"
     icon: "mdi:radiator"
   -
     title: "Eau chaude"
@@ -475,6 +490,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Eau chaude"
@@ -543,8 +572,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning eau chaude"
     path: "chauffage-ecs-planning"
@@ -554,6 +583,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning eau chaude"
@@ -580,8 +623,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-ecs"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Historique ECS"
     path: "chauffage-ecs-historique"
@@ -591,6 +634,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Historique ECS"
@@ -621,8 +678,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-ecs"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "État technique"
     path: "chauffage-pac-technique"
@@ -632,6 +689,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "État technique"
@@ -662,8 +733,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Diagnostic PAC"
     path: "chauffage-pac-diagnostic"
@@ -673,6 +744,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Diagnostic PAC"
@@ -695,8 +780,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-pac-technique"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Paramètres chauffage"
     path: "chauffage-parametres"
@@ -706,6 +791,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Paramètres Vannes"
@@ -743,8 +842,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Zone parents"
     path: "chauffage-zone-parents"
@@ -754,6 +853,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Zone parents"
@@ -821,8 +934,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "1er étage"
     path: "chauffage-zone-premier-etage"
@@ -832,6 +945,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "1er étage"
@@ -971,8 +1098,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Sous-sol"
     path: "chauffage-zone-sous-sol"
@@ -982,6 +1109,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Sous-sol"
@@ -1031,8 +1172,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Chambre parents"
     path: "chauffage-piece-chambre-parents"
@@ -1042,6 +1183,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Chambre parents"
@@ -1241,8 +1396,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-parents"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Chambre parents"
     path: "chauffage-planning-piece-chambre-parents"
@@ -1252,6 +1407,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Chambre parents"
@@ -1304,8 +1473,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-chambre-parents"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Dressing"
     path: "chauffage-piece-dressing"
@@ -1315,6 +1484,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Dressing"
@@ -1514,8 +1697,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-parents"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Dressing"
     path: "chauffage-planning-piece-dressing"
@@ -1525,6 +1708,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Dressing"
@@ -1577,8 +1774,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-dressing"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "SDB parents"
     path: "chauffage-piece-sdb-parents"
@@ -1588,6 +1785,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "SDB parents"
@@ -1787,8 +1998,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-parents"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning SDB parents"
     path: "chauffage-planning-piece-sdb-parents"
@@ -1798,6 +2009,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · SDB parents"
@@ -1850,8 +2075,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-sdb-parents"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Chambre Julie"
     path: "chauffage-piece-chambre-julie"
@@ -1861,6 +2086,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Chambre Julie"
@@ -2060,8 +2299,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Chambre Julie"
     path: "chauffage-planning-piece-chambre-julie"
@@ -2071,6 +2310,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Chambre Julie"
@@ -2123,8 +2376,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-chambre-julie"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Chambre Pablo"
     path: "chauffage-piece-chambre-pablo"
@@ -2134,6 +2387,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Chambre Pablo"
@@ -2333,8 +2600,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Chambre Pablo"
     path: "chauffage-planning-piece-chambre-pablo"
@@ -2344,6 +2611,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Chambre Pablo"
@@ -2396,8 +2677,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-chambre-pablo"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Grande chambre amis"
     path: "chauffage-piece-grande-chambre-amis"
@@ -2407,6 +2688,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Grande chambre amis"
@@ -2606,8 +2901,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Grande chambre amis"
     path: "chauffage-planning-piece-grande-chambre-amis"
@@ -2617,6 +2912,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Grande chambre amis"
@@ -2669,8 +2978,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-grande-chambre-amis"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Petite chambre amis"
     path: "chauffage-piece-petite-chambre-amis"
@@ -2680,6 +2989,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Petite chambre amis"
@@ -2879,8 +3202,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Petite chambre amis"
     path: "chauffage-planning-piece-petite-chambre-amis"
@@ -2890,6 +3213,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Petite chambre amis"
@@ -2942,8 +3279,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-petite-chambre-amis"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Chambre Mathias"
     path: "chauffage-piece-chambre-mathias"
@@ -2953,6 +3290,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Chambre Mathias"
@@ -3152,8 +3503,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Chambre Mathias"
     path: "chauffage-planning-piece-chambre-mathias"
@@ -3163,6 +3514,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Chambre Mathias"
@@ -3215,8 +3580,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-chambre-mathias"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "SDB garçons"
     path: "chauffage-piece-sdb-garcons"
@@ -3226,6 +3591,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "SDB garçons"
@@ -3425,8 +3804,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning SDB garçons"
     path: "chauffage-planning-piece-sdb-garcons"
@@ -3436,6 +3815,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · SDB garçons"
@@ -3488,8 +3881,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-sdb-garcons"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "SDB Julie"
     path: "chauffage-piece-sdb-julie"
@@ -3499,6 +3892,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "SDB Julie"
@@ -3698,8 +4105,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-premier-etage"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning SDB Julie"
     path: "chauffage-planning-piece-sdb-julie"
@@ -3709,6 +4116,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · SDB Julie"
@@ -3761,8 +4182,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-sdb-julie"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Buanderie"
     path: "chauffage-piece-buanderie"
@@ -3772,6 +4193,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Buanderie"
@@ -3971,8 +4406,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-v2"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Buanderie"
     path: "chauffage-planning-piece-buanderie"
@@ -3982,6 +4417,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Buanderie"
@@ -4034,8 +4483,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-buanderie"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Atelier"
     path: "chauffage-piece-atelier"
@@ -4045,6 +4494,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Atelier"
@@ -4244,8 +4707,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-sous-sol"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Atelier"
     path: "chauffage-planning-piece-atelier"
@@ -4255,6 +4718,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Atelier"
@@ -4307,8 +4784,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-atelier"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Salle ciné"
     path: "chauffage-piece-salle-cine"
@@ -4318,6 +4795,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Salle ciné"
@@ -4517,8 +5008,8 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-zone-sous-sol"
+    background: "#e4e9f0"
+    visible: false
   -
     title: "Planning Salle ciné"
     path: "chauffage-planning-piece-salle-cine"
@@ -4528,6 +5019,20 @@ views:
       -
         type: "grid"
         cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
           -
             type: "custom:mushroom-title-card"
             title: "Planning · Salle ciné"
@@ -4580,5 +5085,5 @@ views:
             grid_options:
               columns: "full"
               rows: "auto"
-    subview: true
-    back_path: "/lovelace-mobile/chauffage-piece-salle-cine"
+    background: "#e4e9f0"
+    visible: false
