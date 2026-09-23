@@ -1,0 +1,1198 @@
+# Paramètres techniques — vues générées par tools/generate_technical_dashboard.py
+# Remplacer les vues technique* du tableau de bord lovelace-mobile après validation.
+# La carte d'accès de l'accueil est HOME_CARD dans le générateur.
+
+views:
+  -
+    title: "Paramètres techniques"
+    path: "technique"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Paramètres techniques"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "conditional"
+            conditions:
+              -
+                condition: "state"
+                entity: "sensor.resume_technique"
+                state: "alerte"
+            card:
+              type: "custom:mushroom-template-card"
+              entity: "sensor.resume_technique"
+              primary: "À traiter"
+              secondary: "{{ state_attr('sensor.resume_technique', 'alertes') | join('\\n') }}"
+              multiline_secondary: true
+              icon: "mdi:alert"
+              icon_color: "red"
+              card_mod:
+                style: "ha-card { background: #FCEBEB; --primary-text-color: #791F1F; --secondary-text-color: #A32D2D; }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Serveur HA"
+            secondary: "CPU {{ states('sensor.home_assistant_core_pourcentage_du_processeur') | float(0) | round(0) }} % · disque {{ states('sensor.disque_serveur_ha_utilise') }} %"
+            icon: "mdi:home-assistant"
+            icon_color: "{{ 'green' if states('sensor.disque_serveur_ha_utilise') | float(0) <= 85 else 'orange' if false else 'red' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-serveur"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "NAS"
+            secondary: "{{ 'Normal' if is_state('sensor.nas_eric_status', 'normal') else states('sensor.nas_eric_status') }} · {{ states('sensor.nas_eric_volume_used') | float(0) | round(0) }} %"
+            icon: "mdi:nas"
+            icon_color: "{{ 'green' if is_state('sensor.nas_eric_status', 'normal') and states('sensor.nas_eric_volume_used') | float(0) <= 85 else 'orange' if false else 'red' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-nas"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Onduleur"
+            secondary: "{{ 'Secteur' if states('sensor.ups_code_d_etat').startswith('OL') else 'Sur batterie' }} · {{ (states('sensor.ups_autonomie_de_la_batterie') | float(0) / 60) | round(0) }} min"
+            icon: "mdi:power-plug-battery"
+            icon_color: "{{ 'green' if states('sensor.ups_code_d_etat').startswith('OL') else 'orange' if false else 'red' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-onduleur"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Batteries"
+            secondary: "{% set n = states('sensor.batteries_zigbee_faibles') | int(0) %}{{ 'Toutes OK' if n == 0 else n ~ ' à remplacer' }}"
+            icon: "mdi:battery-heart-variant"
+            icon_color: "{{ 'green' if states('sensor.batteries_zigbee_faibles') | int(0) == 0 else 'orange' if false else 'red' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-batteries"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Zigbee"
+            secondary: "{{ 'Connecté' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state', 'on') else 'Déconnecté' }} · {{ states('sensor.appareils_zigbee_indisponibles') }} hors ligne"
+            icon: "mdi:zigbee"
+            icon_color: "{{ 'green' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state', 'on') and states('sensor.appareils_zigbee_indisponibles') | int(0) == 0 else 'orange' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state', 'on') else 'red' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-zigbee"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Mises à jour"
+            secondary: "{% set n = states('sensor.mises_a_jour_en_attente') | int(0) %}{{ 'À jour' if n == 0 else n ~ ' en attente' }}"
+            icon: "mdi:package-up"
+            icon_color: "{{ 'green' if states('sensor.mises_a_jour_en_attente') | int(0) == 0 else 'orange' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-mises-a-jour"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Sauvegardes"
+            secondary: "{% set t = state_attr('sensor.backup_state', 'last_backup') %}{{ 'Dernière ' ~ (as_datetime(t) | as_local).strftime('%d/%m %H:%M') if t else states('sensor.backup_state') }}"
+            icon: "mdi:cloud-upload"
+            icon_color: "{{ 'red' if is_state('binary_sensor.backups_stale', 'on') else 'green' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-sauvegardes"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Santé config"
+            secondary: "{% set w = states('sensor.watchman_missing_entities') | int(0) %}{{ 'Aucune anomalie' if w == 0 else w ~ ' entités manquantes' }}"
+            icon: "mdi:stethoscope"
+            icon_color: "{{ 'green' if states('sensor.watchman_missing_entities') | int(0) == 0 else 'orange' }}"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/technique-sante"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:server"
+  -
+    title: "Serveur HA"
+    path: "technique-serveur"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Serveur HA"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Ressources de la VM"
+          -
+            type: "custom:bar-card"
+            entities:
+              -
+                entity: "sensor.home_assistant_core_pourcentage_du_processeur"
+                name: "CPU Home Assistant"
+              -
+                entity: "sensor.home_assistant_core_pourcentage_de_memoire"
+                name: "Mémoire Home Assistant"
+              -
+                entity: "sensor.disque_serveur_ha_utilise"
+                name: "Disque"
+            positions:
+              icon: "off"
+              indicator: "off"
+            height: 26
+            max: 100
+            severity:
+              -
+                from: 0
+                to: 70
+                color: "#639922"
+              -
+                from: 70
+                to: 85
+                color: "#EF9F27"
+              -
+                from: 85
+                to: 100
+                color: "#E24B4A"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Disque"
+            secondary: "{{ states('sensor.home_assistant_host_taille_du_disque_utilise') }} Go utilisés sur {{ states('sensor.home_assistant_host_taille_total_du_disque') }} Go · {{ states('sensor.home_assistant_host_taille_du_disque_libre') }} Go libres"
+            icon: "mdi:harddisk"
+            icon_color: "blue"
+            entity: "sensor.home_assistant_host_taille_du_disque_libre"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Versions"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Core HA"
+            secondary: "{{ state_attr('update.home_assistant_core_update', 'installed_version') }}{{ ' → ' ~ state_attr('update.home_assistant_core_update', 'latest_version') if is_state('update.home_assistant_core_update', 'on') }}"
+            icon: "mdi:home-assistant"
+            icon_color: "{{ 'orange' if is_state('update.home_assistant_core_update', 'on') else 'green' }}"
+            entity: "update.home_assistant_core_update"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Système (OS)"
+            secondary: "{{ state_attr('update.home_assistant_operating_system_update', 'installed_version') }}{{ ' → ' ~ state_attr('update.home_assistant_operating_system_update', 'latest_version') if is_state('update.home_assistant_operating_system_update', 'on') }}"
+            icon: "mdi:linux"
+            icon_color: "{{ 'orange' if is_state('update.home_assistant_operating_system_update', 'on') else 'green' }}"
+            entity: "update.home_assistant_operating_system_update"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Supervisor"
+            secondary: "{{ state_attr('update.home_assistant_supervisor_update', 'installed_version') }}"
+            icon: "mdi:cog-outline"
+            icon_color: "{{ 'orange' if is_state('update.home_assistant_supervisor_update', 'on') else 'green' }}"
+            entity: "update.home_assistant_supervisor_update"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Accès distant"
+            secondary: "{{ 'Nabu Casa actif' if is_state('binary_sensor.remote_ui', 'on') else 'Inactif' }}"
+            icon: "mdi:cloud-lock-outline"
+            icon_color: "{{ 'green' if is_state('binary_sensor.remote_ui', 'on') else 'red' }}"
+            entity: "binary_sensor.remote_ui"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Modules complémentaires"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Zigbee2MQTT"
+            secondary: "{{ 'En marche' if is_state('binary_sensor.zigbee2mqtt_en_cours_d_execution', 'on') else 'Arrêté' }}"
+            icon: "mdi:zigbee"
+            icon_color: "{{ 'green' if is_state('binary_sensor.zigbee2mqtt_en_cours_d_execution', 'on') else 'red' }}"
+            entity: "binary_sensor.zigbee2mqtt_en_cours_d_execution"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Mosquitto"
+            secondary: "{{ 'En marche' if is_state('binary_sensor.mosquitto_broker_en_cours_d_execution', 'on') else 'Arrêté' }}"
+            icon: "mdi:message-processing-outline"
+            icon_color: "{{ 'green' if is_state('binary_sensor.mosquitto_broker_en_cours_d_execution', 'on') else 'red' }}"
+            entity: "binary_sensor.mosquitto_broker_en_cours_d_execution"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:home-assistant"
+  -
+    title: "NAS Synology"
+    path: "technique-nas"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "NAS Synology"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "État"
+            secondary: "{{ 'Normal' if is_state('sensor.nas_eric_status', 'normal') else states('sensor.nas_eric_status') }} · DSM {{ 'à mettre à jour' if is_state('update.nas_eric_dsm_update', 'on') else 'à jour' }}"
+            icon: "mdi:nas"
+            icon_color: "{{ 'green' if is_state('sensor.nas_eric_status', 'normal') else 'red' }}"
+            entity: "sensor.nas_eric_status"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Ressources"
+          -
+            type: "custom:bar-card"
+            entities:
+              -
+                entity: "sensor.nas_eric_cpu_utilization_total"
+                name: "CPU"
+              -
+                entity: "sensor.nas_eric_memory_usage_real"
+                name: "Mémoire"
+              -
+                entity: "sensor.nas_eric_volume_used"
+                name: "Volume"
+              -
+                entity: "sensor.nas_eric_usb_disk_1_partition_1_partition_utilisee"
+                name: "Disque USB"
+            positions:
+              icon: "off"
+              indicator: "off"
+            height: 26
+            max: 100
+            severity:
+              -
+                from: 0
+                to: 70
+                color: "#639922"
+              -
+                from: 70
+                to: 85
+                color: "#EF9F27"
+              -
+                from: 85
+                to: 100
+                color: "#E24B4A"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Disques"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Disque 1"
+            secondary: "{{ states('sensor.nas_eric_temperature') }} °C · {{ 'normal' if is_state('sensor.nas_eric_status', 'normal') else states('sensor.nas_eric_status') }}"
+            icon: "mdi:harddisk"
+            icon_color: "{{ 'green' if is_state('sensor.nas_eric_status', 'normal') and states('sensor.nas_eric_temperature') | float(0) < 50 else 'red' }}"
+            entity: "sensor.nas_eric_temperature"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Disque 2"
+            secondary: "{{ states('sensor.nas_eric_temperature_2') }} °C · {{ 'normal' if is_state('sensor.nas_eric_status_2', 'normal') else states('sensor.nas_eric_status_2') }}"
+            icon: "mdi:harddisk"
+            icon_color: "{{ 'green' if is_state('sensor.nas_eric_status_2', 'normal') and states('sensor.nas_eric_temperature_2') | float(0) < 50 else 'red' }}"
+            entity: "sensor.nas_eric_temperature_2"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Disque 3"
+            secondary: "{{ states('sensor.nas_eric_temperature_3') }} °C · {{ 'normal' if is_state('sensor.nas_eric_status_3', 'normal') else states('sensor.nas_eric_status_3') }}"
+            icon: "mdi:harddisk"
+            icon_color: "{{ 'green' if is_state('sensor.nas_eric_status_3', 'normal') and states('sensor.nas_eric_temperature_3') | float(0) < 50 else 'red' }}"
+            entity: "sensor.nas_eric_temperature_3"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Santé disques"
+            secondary: "{{ 'Aucun secteur défectueux, durée de vie OK' if is_state('binary_sensor.nas_eric_exceeded_max_bad_sectors', 'off') and is_state('binary_sensor.nas_eric_exceeded_max_bad_sectors_2', 'off') and is_state('binary_sensor.nas_eric_below_min_remaining_life', 'off') and is_state('binary_sensor.nas_eric_below_min_remaining_life_2', 'off') else 'Problème détecté' }}"
+            icon: "mdi:heart-pulse"
+            icon_color: "{{ 'green' if is_state('binary_sensor.nas_eric_exceeded_max_bad_sectors', 'off') and is_state('binary_sensor.nas_eric_exceeded_max_bad_sectors_2', 'off') and is_state('binary_sensor.nas_eric_below_min_remaining_life', 'off') and is_state('binary_sensor.nas_eric_below_min_remaining_life_2', 'off') else 'red' }}"
+            entity: "binary_sensor.nas_eric_exceeded_max_bad_sectors"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Actions"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Redémarrer"
+            secondary: "Appui long"
+            icon: "mdi:restart"
+            icon_color: "orange"
+            entity: "button.nas_eric_reboot"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "perform-action"
+              perform_action: "button.press"
+              target:
+                entity_id: "button.nas_eric_reboot"
+              confirmation:
+                text: "Redémarrer le NAS ? Home Assistant (VM) sera arrêté pendant le redémarrage."
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Éteindre"
+            secondary: "Appui long"
+            icon: "mdi:power"
+            icon_color: "red"
+            entity: "button.nas_eric_shutdown"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "perform-action"
+              perform_action: "button.press"
+              target:
+                entity_id: "button.nas_eric_shutdown"
+              confirmation:
+                text: "Éteindre le NAS ? Home Assistant (VM) s'arrêtera et ne redémarrera pas seul."
+            grid_options:
+              columns: 6
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:nas"
+  -
+    title: "Onduleur"
+    path: "technique-onduleur"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Onduleur"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "État"
+            secondary: "{{ states('sensor.ups_etat') }} ({{ states('sensor.ups_code_d_etat') }})"
+            icon: "mdi:power-plug-battery"
+            icon_color: "{{ 'green' if states('sensor.ups_code_d_etat').startswith('OL') else 'red' }}"
+            entity: "sensor.ups_etat"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:bar-card"
+            entities:
+              -
+                entity: "sensor.ups_charge_de_la_batterie"
+                name: "Charge de la batterie"
+            positions:
+              icon: "off"
+              indicator: "off"
+            height: 26
+            max: 100
+            severity:
+              -
+                from: 0
+                to: 20
+                color: "#E24B4A"
+              -
+                from: 20
+                to: 50
+                color: "#EF9F27"
+              -
+                from: 50
+                to: 100
+                color: "#639922"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Autonomie"
+            secondary: "{{ (states('sensor.ups_autonomie_de_la_batterie') | float(0) / 60) | round(0) }} min"
+            icon: "mdi:timer-sand"
+            icon_color: "blue"
+            entity: "sensor.ups_autonomie_de_la_batterie"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Charge de sortie"
+            secondary: "{{ states('sensor.ups_charge') }} %"
+            icon: "mdi:gauge"
+            icon_color: "blue"
+            entity: "sensor.ups_charge"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Tension"
+            secondary: "{{ states('sensor.ups_tension_de_sortie') }} V"
+            icon: "mdi:sine-wave"
+            icon_color: "blue"
+            entity: "sensor.ups_tension_de_sortie"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Délai d'arrêt"
+            secondary: "{{ states('sensor.ups_delai_d_arret_de_l_onduleur') }} s"
+            icon: "mdi:timer-off-outline"
+            icon_color: "grey"
+            entity: "sensor.ups_delai_d_arret_de_l_onduleur"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Seuil bas"
+            secondary: "{{ states('sensor.ups_consigne_de_batterie_faible') }} %"
+            icon: "mdi:battery-alert-variant-outline"
+            icon_color: "grey"
+            entity: "sensor.ups_consigne_de_batterie_faible"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Batterie"
+            secondary: "{{ states('sensor.ups_chimie_de_la_batterie') }} (plomb)"
+            icon: "mdi:car-battery"
+            icon_color: "grey"
+            entity: "sensor.ups_chimie_de_la_batterie"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:power-plug-battery"
+  -
+    title: "Batteries"
+    path: "technique-batteries"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Batteries"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-number-card"
+            entity: "input_number.seuil_alerte_batterie"
+            name: "Seuil d'alerte"
+            icon_color: "red"
+            display_mode: "buttons"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Alerte quotidienne"
+            secondary: "Résumé à 19:00 sur l'iPhone si une batterie est sous le seuil"
+            icon: "mdi:bell-outline"
+            icon_color: "grey"
+            entity: "automation.alerte_batteries_zigbee_faibles"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:auto-entities"
+            show_empty: false
+            card:
+              type: "custom:bar-card"
+              title: "À remplacer"
+              positions:
+                icon: "off"
+                indicator: "off"
+              height: 26
+              severity:
+                -
+                  from: 0
+                  to: 20
+                  color: "#E24B4A"
+                -
+                  from: 20
+                  to: 40
+                  color: "#EF9F27"
+                -
+                  from: 40
+                  to: 100
+                  color: "#639922"
+            filter:
+              template: "{% set seuil = states('input_number.seuil_alerte_batterie') | float(20) %}{% set ns = namespace(l=[]) %}{% for s in (integration_entities('mqtt') + integration_entities('hue')) | select('match', 'sensor\\..*_(battery|batterie)$') | expand | selectattr('attributes.device_class', 'eq', 'battery') %}{% set lvl = s.state | float(-1) %}{% if lvl >= 0 and lvl < seuil %}{% set ns.l = ns.l + [{'lvl': lvl, 'entity': s.entity_id, 'name': s.name | regex_replace(' (Batterie|Battery)$', '')}] %}{% endif %}{% endfor %}{% set out = namespace(l=[]) %}{% for b in ns.l | sort(attribute='lvl') %}{% set out.l = out.l + [{'entity': b.entity, 'name': b.name}] %}{% endfor %}{{ out.l }}"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:auto-entities"
+            show_empty: false
+            card:
+              type: "custom:bar-card"
+              title: "À surveiller"
+              positions:
+                icon: "off"
+                indicator: "off"
+              height: 26
+              severity:
+                -
+                  from: 0
+                  to: 20
+                  color: "#E24B4A"
+                -
+                  from: 20
+                  to: 40
+                  color: "#EF9F27"
+                -
+                  from: 40
+                  to: 100
+                  color: "#639922"
+            filter:
+              template: "{% set seuil = states('input_number.seuil_alerte_batterie') | float(20) %}{% set ns = namespace(l=[]) %}{% for s in (integration_entities('mqtt') + integration_entities('hue')) | select('match', 'sensor\\..*_(battery|batterie)$') | expand | selectattr('attributes.device_class', 'eq', 'battery') %}{% set lvl = s.state | float(-1) %}{% if lvl >= seuil and lvl < 40 %}{% set ns.l = ns.l + [{'lvl': lvl, 'entity': s.entity_id, 'name': s.name | regex_replace(' (Batterie|Battery)$', '')}] %}{% endif %}{% endfor %}{% set out = namespace(l=[]) %}{% for b in ns.l | sort(attribute='lvl') %}{% set out.l = out.l + [{'entity': b.entity, 'name': b.name}] %}{% endfor %}{{ out.l }}"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:auto-entities"
+            show_empty: false
+            card:
+              type: "custom:bar-card"
+              title: "OK"
+              positions:
+                icon: "off"
+                indicator: "off"
+              height: 26
+              severity:
+                -
+                  from: 0
+                  to: 20
+                  color: "#E24B4A"
+                -
+                  from: 20
+                  to: 40
+                  color: "#EF9F27"
+                -
+                  from: 40
+                  to: 100
+                  color: "#639922"
+            filter:
+              template: "{% set seuil = states('input_number.seuil_alerte_batterie') | float(20) %}{% set ns = namespace(l=[]) %}{% for s in (integration_entities('mqtt') + integration_entities('hue')) | select('match', 'sensor\\..*_(battery|batterie)$') | expand | selectattr('attributes.device_class', 'eq', 'battery') %}{% set lvl = s.state | float(-1) %}{% if lvl >= 40 and lvl >= seuil %}{% set ns.l = ns.l + [{'lvl': lvl, 'entity': s.entity_id, 'name': s.name | regex_replace(' (Batterie|Battery)$', '')}] %}{% endif %}{% endfor %}{% set out = namespace(l=[]) %}{% for b in ns.l | sort(attribute='lvl') %}{% set out.l = out.l + [{'entity': b.entity, 'name': b.name}] %}{% endfor %}{{ out.l }}"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:auto-entities"
+            show_empty: false
+            card:
+              type: "custom:bar-card"
+              title: "Sans nouvelles"
+              positions:
+                icon: "off"
+                indicator: "off"
+              height: 26
+              severity:
+                -
+                  from: 0
+                  to: 20
+                  color: "#E24B4A"
+                -
+                  from: 20
+                  to: 40
+                  color: "#EF9F27"
+                -
+                  from: 40
+                  to: 100
+                  color: "#639922"
+            filter:
+              template: "{% set seuil = states('input_number.seuil_alerte_batterie') | float(20) %}{% set ns = namespace(l=[]) %}{% for s in (integration_entities('mqtt') + integration_entities('hue')) | select('match', 'sensor\\..*_(battery|batterie)$') | expand | selectattr('attributes.device_class', 'eq', 'battery') %}{% set lvl = s.state | float(-1) %}{% if lvl < 0 %}{% set ns.l = ns.l + [{'lvl': lvl, 'entity': s.entity_id, 'name': s.name | regex_replace(' (Batterie|Battery)$', '')}] %}{% endif %}{% endfor %}{% set out = namespace(l=[]) %}{% for b in ns.l | sort(attribute='lvl') %}{% set out.l = out.l + [{'entity': b.entity, 'name': b.name}] %}{% endfor %}{{ out.l }}"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:battery-heart-variant"
+  -
+    title: "Zigbee"
+    path: "technique-zigbee"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Zigbee"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Zigbee2MQTT"
+            secondary: "{{ 'Connecté' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state', 'on') else 'Déconnecté' }} · version {{ states('sensor.zigbee2mqtt_bridge_version') }}"
+            icon: "mdi:zigbee"
+            icon_color: "{{ 'green' if is_state('binary_sensor.zigbee2mqtt_bridge_connection_state', 'on') else 'red' }}"
+            entity: "binary_sensor.zigbee2mqtt_bridge_connection_state"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Hors ligne"
+            secondary: "{% set n = states('sensor.appareils_zigbee_indisponibles') | int(0) %}{{ 'Aucun' if n == 0 else n }}"
+            icon: "mdi:lan-disconnect"
+            icon_color: "{{ 'green' if states('sensor.appareils_zigbee_indisponibles') | int(0) == 0 else 'orange' }}"
+            entity: "sensor.appareils_zigbee_indisponibles"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Appairage"
+            secondary: "{{ 'OUVERT' if is_state('switch.zigbee2mqtt_bridge_permit_join', 'on') else 'Fermé' }}"
+            icon: "mdi:link-variant"
+            icon_color: "{{ 'red' if is_state('switch.zigbee2mqtt_bridge_permit_join', 'on') else 'grey' }}"
+            entity: "switch.zigbee2mqtt_bridge_permit_join"
+            tap_action:
+              action: "toggle"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Coordinateurs"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "SLZB cave"
+            secondary: "{{ states('sensor.slzb_06_cave_connection_mode') }} · puce {{ states('sensor.slzb_06_cave_temperature_de_la_puce_zigbee') | float(0) | round(0) }} °C"
+            icon: "mdi:router-wireless"
+            icon_color: "{{ 'orange' if is_state('update.slzb_06_cave_zigbee_firmware', 'on') or is_state('update.slzb_06_cave_core_firmware', 'on') else 'green' }}"
+            entity: "sensor.slzb_06_cave_temperature_de_la_puce_zigbee"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "SLZB avant"
+            secondary: "{{ states('sensor.slzb_06_avant_connection_mode') }} · puce {{ states('sensor.slzb_06_avant_temperature_de_la_puce_zigbee') | float(0) | round(0) }} °C"
+            icon: "mdi:router-wireless"
+            icon_color: "{{ 'orange' if is_state('update.slzb_06_avant_zigbee_firmware', 'on') or is_state('update.slzb_06_avant_core_firmware', 'on') else 'green' }}"
+            entity: "sensor.slzb_06_avant_temperature_de_la_puce_zigbee"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "SLZB débarras"
+            secondary: "{{ states('sensor.slzb_06_debarras_connection_mode') }} · puce {{ states('sensor.slzb_06_debarras_temperature_de_la_puce_zigbee') | float(0) | round(0) }} °C"
+            icon: "mdi:router-wireless"
+            icon_color: "{{ 'orange' if is_state('update.slzb_06_debarras_zigbee_firmware', 'on') or is_state('update.slzb_06_debarras_core_firmware', 'on') else 'green' }}"
+            entity: "sensor.slzb_06_debarras_temperature_de_la_puce_zigbee"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Actions"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Redémarrer Zigbee2MQTT"
+            secondary: "Appui long"
+            icon: "mdi:restart"
+            icon_color: "orange"
+            entity: "button.zigbee2mqtt_bridge_restart"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "perform-action"
+              perform_action: "button.press"
+              target:
+                entity_id: "button.zigbee2mqtt_bridge_restart"
+              confirmation:
+                text: "Redémarrer Zigbee2MQTT ? Les appareils Zigbee seront injoignables une minute."
+            grid_options:
+              columns: "full"
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:zigbee"
+  -
+    title: "Mises à jour"
+    path: "technique-mises-a-jour"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Mises à jour"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:auto-entities"
+            show_empty: true
+            card:
+              type: "entities"
+              state_color: true
+            filter:
+              include:
+                -
+                  domain: "update"
+                  state: "on"
+            sort:
+              method: "name"
+            else:
+              type: "custom:mushroom-template-card"
+              primary: "Tout est à jour"
+              icon: "mdi:check-circle"
+              icon_color: "green"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Installer"
+            secondary: "Touche une ligne pour voir les notes de version et installer"
+            icon: "mdi:information-outline"
+            icon_color: "grey"
+            tap_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:package-up"
+  -
+    title: "Sauvegardes"
+    path: "technique-sauvegardes"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Sauvegardes"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Google Drive Backup"
+            secondary: "{{ 'Sauvegarde trop ancienne' if is_state('binary_sensor.backups_stale', 'on') else 'À jour' }}"
+            icon: "mdi:google-drive"
+            icon_color: "{{ 'red' if is_state('binary_sensor.backups_stale', 'on') else 'green' }}"
+            entity: "binary_sensor.backups_stale"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Dernière"
+            secondary: "{{ (as_datetime(state_attr('sensor.backup_state', 'last_backup')) | as_local).strftime('%d/%m à %H:%M') if state_attr('sensor.backup_state', 'last_backup') else '—' }}"
+            icon: "mdi:history"
+            icon_color: "blue"
+            entity: "sensor.backup_state"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Prochaine"
+            secondary: "{{ (as_datetime(state_attr('sensor.backup_state', 'next_backup')) | as_local).strftime('%d/%m à %H:%M') if state_attr('sensor.backup_state', 'next_backup') else '—' }}"
+            icon: "mdi:calendar-clock"
+            icon_color: "blue"
+            entity: "sensor.backup_state"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Sur Google Drive"
+            secondary: "{{ state_attr('sensor.backup_state', 'backups_in_google_drive') }} sauvegardes · {{ state_attr('sensor.backup_state', 'size_in_google_drive') }}"
+            icon: "mdi:cloud-check-outline"
+            icon_color: "blue"
+            entity: "sensor.backup_state"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Sur la VM"
+            secondary: "{{ state_attr('sensor.backup_state', 'backups_in_home_assistant') }} sauvegardes · {{ state_attr('sensor.backup_state', 'size_in_home_assistant') }}"
+            icon: "mdi:harddisk"
+            icon_color: "grey"
+            entity: "sensor.backup_state"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:cloud-upload"
+  -
+    title: "Santé de la configuration"
+    path: "technique-sante"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Santé de la configuration"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Résumé"
+            secondary: "{% set l = (state_attr('sensor.resume_technique', 'alertes') or []) + (state_attr('sensor.resume_technique', 'avertissements') or []) %}{{ l | join('\\n') if l else 'Tout est normal' }}"
+            icon: "mdi:clipboard-pulse-outline"
+            icon_color: "{{ {'ok': 'green', 'attention': 'orange'}.get(states('sensor.resume_technique'), 'red') }}"
+            entity: "sensor.resume_technique"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Watchman"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Entités"
+            secondary: "{{ states('sensor.watchman_missing_entities') }}"
+            icon: "mdi:shape-outline"
+            icon_color: "{{ 'green' if states('sensor.watchman_missing_entities') | int(0) == 0 else 'orange' }}"
+            entity: "sensor.watchman_missing_entities"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Actions"
+            secondary: "{{ states('sensor.watchman_missing_services') }}"
+            icon: "mdi:function-variant"
+            icon_color: "{{ 'green' if states('sensor.watchman_missing_services') | int(0) == 0 else 'orange' }}"
+            entity: "sensor.watchman_missing_services"
+            tap_action:
+              action: "more-info"
+            multiline_secondary: true
+            grid_options:
+              columns: 6
+              rows: "auto"
+          -
+            type: "custom:mushroom-template-card"
+            primary: "Dernière analyse"
+            secondary: "{{ (as_datetime(states('sensor.watchman_last_updated')) | as_local).strftime('%d/%m à %H:%M') if states('sensor.watchman_last_updated') not in ['unknown', 'unavailable'] else '—' }}"
+            icon: "mdi:magnify-scan"
+            icon_color: "grey"
+            entity: "sensor.watchman_last_updated"
+            tap_action:
+              action: "more-info"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+    icon: "mdi:stethoscope"

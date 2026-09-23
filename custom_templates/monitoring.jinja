@@ -1,0 +1,47 @@
+{# Macros du monitoring technique (packages/monitoring.yaml). Chaque macro
+   renvoie une liste JSON, pour que l'état (nombre) et l'attribut (liste)
+   d'un capteur viennent de la même source. #}
+
+{# Batteries des appareils Zigbee (Zigbee2MQTT et pont Hue) sous le seuil,
+   de la plus faible à la plus forte : ["Interrupteur Ciné : 1 %", ...].
+   Le filtre sur le nom avant expand limite l'écoute aux seuls capteurs de
+   batterie (sinon chaque mesure Linky ou prise relance le calcul). #}
+{% macro batteries_faibles() -%}
+  {%- set seuil = states('input_number.seuil_alerte_batterie') | float(20) -%}
+  {%- set ns = namespace(l=[]) -%}
+  {%- for s in (integration_entities('mqtt') + integration_entities('hue')) | select('match', 'sensor\..*_(battery|batterie)$') | expand
+       if s.attributes.device_class == 'battery' and s.state | is_number and s.state | float < seuil -%}
+    {%- set ns.l = ns.l + [{'nom': s.name | regex_replace(' (Batterie|Battery)$', ''), 'niveau': s.state | float | round(0) | int}] -%}
+  {%- endfor -%}
+  {%- set out = namespace(l=[]) -%}
+  {%- for b in ns.l | sort(attribute='niveau') -%}
+    {%- set out.l = out.l + [b.nom ~ ' : ' ~ b.niveau ~ ' %'] -%}
+  {%- endfor -%}
+  {{- out.l | to_json -}}
+{%- endmacro %}
+
+{# Problèmes à traiter (rouge) #}
+{% macro alertes() -%}
+  {%- set ns = namespace(l=[]) -%}
+  {%- set n = states('sensor.batteries_zigbee_faibles') | int(0) -%}
+  {%- if n > 0 %}{% set ns.l = ns.l + [n ~ (' batterie à remplacer' if n == 1 else ' batteries à remplacer')] %}{% endif -%}
+  {%- if not states('sensor.ups_code_d_etat').startswith('OL') %}{% set ns.l = ns.l + ['Onduleur : ' ~ states('sensor.ups_etat')] %}{% endif -%}
+  {%- if not is_state('binary_sensor.zigbee2mqtt_bridge_connection_state', 'on') %}{% set ns.l = ns.l + ['Zigbee2MQTT déconnecté'] %}{% endif -%}
+  {%- if is_state('binary_sensor.backups_stale', 'on') %}{% set ns.l = ns.l + ['Sauvegarde trop ancienne'] %}{% endif -%}
+  {%- if not is_state('sensor.nas_eric_status', 'normal') %}{% set ns.l = ns.l + ['NAS : ' ~ states('sensor.nas_eric_status')] %}{% endif -%}
+  {%- if states('sensor.nas_eric_volume_used') | float(0) > 85 %}{% set ns.l = ns.l + ['Volume NAS plein à ' ~ states('sensor.nas_eric_volume_used') ~ ' %'] %}{% endif -%}
+  {%- if states('sensor.disque_serveur_ha_utilise') | float(0) > 85 %}{% set ns.l = ns.l + ['Disque HA plein à ' ~ states('sensor.disque_serveur_ha_utilise') ~ ' %'] %}{% endif -%}
+  {{- ns.l | to_json -}}
+{%- endmacro %}
+
+{# Points à surveiller (orange) #}
+{% macro avertissements() -%}
+  {%- set ns = namespace(l=[]) -%}
+  {%- set z = states('sensor.appareils_zigbee_indisponibles') | int(0) -%}
+  {%- if z > 0 %}{% set ns.l = ns.l + [z ~ (' appareil Zigbee indisponible' if z == 1 else ' appareils Zigbee indisponibles')] %}{% endif -%}
+  {%- set m = states('sensor.mises_a_jour_en_attente') | int(0) -%}
+  {%- if m > 0 %}{% set ns.l = ns.l + [m ~ (' mise à jour' if m == 1 else ' mises à jour')] %}{% endif -%}
+  {%- set w = states('sensor.watchman_missing_entities') | int(0) -%}
+  {%- if w > 0 %}{% set ns.l = ns.l + [w ~ ' entités manquantes'] %}{% endif -%}
+  {{- ns.l | to_json -}}
+{%- endmacro %}

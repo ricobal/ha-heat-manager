@@ -1,0 +1,87 @@
+# Monitoring technique : résumés pour la page « Paramètres techniques »
+# du tableau de bord lovelace-mobile et alerte quotidienne des batteries.
+# Logique des listes : custom_templates/monitoring.jinja.
+
+input_number:
+  seuil_alerte_batterie:
+    name: Seuil d'alerte batterie
+    min: 5
+    max: 50
+    step: 5
+    initial: 20
+    unit_of_measurement: "%"
+    icon: mdi:battery-alert-variant-outline
+    mode: slider
+
+template:
+  - sensor:
+      - name: Batteries Zigbee faibles
+        unique_id: monitoring_batteries_zigbee_faibles
+        icon: mdi:battery-alert-variant-outline
+        state: "{% from 'monitoring.jinja' import batteries_faibles %}{{ batteries_faibles() | from_json | count }}"
+        attributes:
+          appareils: "{% from 'monitoring.jinja' import batteries_faibles %}{{ batteries_faibles() | from_json }}"
+
+      - name: Mises à jour en attente
+        unique_id: monitoring_mises_a_jour_en_attente
+        icon: mdi:package-up
+        state: "{{ states.update | selectattr('state', 'eq', 'on') | list | count }}"
+
+      - name: Disque serveur HA utilisé
+        unique_id: monitoring_disque_serveur_ha_utilise
+        icon: mdi:harddisk
+        unit_of_measurement: "%"
+        state: >-
+          {% set u = states('sensor.home_assistant_host_taille_du_disque_utilise') | float(0) %}
+          {% set t = states('sensor.home_assistant_host_taille_total_du_disque') | float(0) %}
+          {{ (100 * u / t) | round(0) if t > 0 else none }}
+
+      # ok / attention / alerte ; les listes alimentent le bandeau de la page
+      # technique et la carte de l'accueil.
+      - name: Résumé technique
+        unique_id: monitoring_resume_technique
+        icon: mdi:server
+        state: >-
+          {% from 'monitoring.jinja' import alertes, avertissements %}
+          {{ 'alerte' if alertes() | from_json else 'attention' if avertissements() | from_json else 'ok' }}
+        attributes:
+          alertes: "{% from 'monitoring.jinja' import alertes %}{{ alertes() | from_json }}"
+          avertissements: "{% from 'monitoring.jinja' import avertissements %}{{ avertissements() | from_json }}"
+
+  # Recalculé chaque minute : écouter les ~600 entités MQTT relancerait le
+  # calcul à chaque mesure.
+  - triggers:
+      - trigger: time_pattern
+        minutes: /1
+      - trigger: homeassistant
+        event: start
+    sensor:
+      - name: Appareils Zigbee indisponibles
+        unique_id: monitoring_appareils_zigbee_indisponibles
+        icon: mdi:zigbee
+        state: >-
+          {{ (integration_entities('mqtt') + integration_entities('hue'))
+             | select('is_state', 'unavailable') | map('device_id') | reject('none')
+             | unique | list | count }}
+
+automation:
+  - id: monitoring_alerte_batteries_zigbee
+    alias: Alerte batteries Zigbee faibles
+    description: Résumé quotidien des batteries Zigbee sous le seuil réglé sur la page Batteries.
+    mode: single
+    triggers:
+      - trigger: time
+        at: "19:00:00"
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.batteries_zigbee_faibles
+        above: 0
+    actions:
+      - action: notify.mobile_app_iphone_eb_14
+        data:
+          title: >-
+            {% set n = states('sensor.batteries_zigbee_faibles') | int(0) %}
+            {{ n }} {{ 'batterie faible' if n == 1 else 'batteries faibles' }} (< {{ states('input_number.seuil_alerte_batterie') | int }} %)
+          message: "{{ state_attr('sensor.batteries_zigbee_faibles', 'appareils') | join('\n') }}"
+          data:
+            url: /lovelace-mobile/technique-batteries
