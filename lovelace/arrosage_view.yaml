@@ -156,8 +156,44 @@ views:
             icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:briefcase' }}"
             icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
             tap_action:
-              action: "more-info"
-              entity: "script.etherain_arroser_bureau"
+              action: "fire-dom-event"
+              browser_mod:
+                service: "browser_mod.sequence"
+                data:
+                  sequence:
+                    -
+                      service: "input_number.set_value"
+                      data:
+                        entity_id: "input_number.etherain_duree_manuelle"
+                        value: 1
+                    -
+                      service: "browser_mod.popup"
+                      data:
+                        title: "Bureau"
+                        content:
+                          type: "custom:numberbox-card"
+                          entity: "input_number.etherain_duree_manuelle"
+                          name: false
+                          icon: false
+                          border: false
+                          unit: "min"
+                          card_mod:
+                            style: |-
+                              ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 8px; }
+                              .cur-box { display: flex; align-items: center; justify-content: center; gap: 28px; }
+                              .cur-num { font-size: 40px !important; font-weight: 500 !important; margin: 0 !important; line-height: 1.2 !important; }
+                              .cur-unit { font-size: 18px !important; margin-left: 4px; opacity: 0.6; }
+                              ha-icon { --mdc-icon-size: 28px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(33,150,243,0.12); color: rgb(33,150,243); cursor: pointer; padding: 0 !important; }
+                        right_button: "Arroser"
+                        right_button_variant: "brand"
+                        right_button_appearance: "accent"
+                        right_button_action:
+                          service: "script.etherain_arroser_duree_choisie"
+                          data:
+                            zone: 1
+                        left_button: "Annuler"
+                        left_button_variant: "neutral"
+                        left_button_appearance: "plain"
             hold_action:
               action: "none"
             card_mod:
@@ -172,8 +208,44 @@ views:
             icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:sofa' }}"
             icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
             tap_action:
-              action: "more-info"
-              entity: "script.etherain_arroser_salon"
+              action: "fire-dom-event"
+              browser_mod:
+                service: "browser_mod.sequence"
+                data:
+                  sequence:
+                    -
+                      service: "input_number.set_value"
+                      data:
+                        entity_id: "input_number.etherain_duree_manuelle"
+                        value: 1
+                    -
+                      service: "browser_mod.popup"
+                      data:
+                        title: "Salon"
+                        content:
+                          type: "custom:numberbox-card"
+                          entity: "input_number.etherain_duree_manuelle"
+                          name: false
+                          icon: false
+                          border: false
+                          unit: "min"
+                          card_mod:
+                            style: |-
+                              ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 8px; }
+                              .cur-box { display: flex; align-items: center; justify-content: center; gap: 28px; }
+                              .cur-num { font-size: 40px !important; font-weight: 500 !important; margin: 0 !important; line-height: 1.2 !important; }
+                              .cur-unit { font-size: 18px !important; margin-left: 4px; opacity: 0.6; }
+                              ha-icon { --mdc-icon-size: 28px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(33,150,243,0.12); color: rgb(33,150,243); cursor: pointer; padding: 0 !important; }
+                        right_button: "Arroser"
+                        right_button_variant: "brand"
+                        right_button_appearance: "accent"
+                        right_button_action:
+                          service: "script.etherain_arroser_duree_choisie"
+                          data:
+                            zone: 2
+                        left_button: "Annuler"
+                        left_button_variant: "neutral"
+                        left_button_appearance: "plain"
             hold_action:
               action: "none"
             card_mod:
@@ -188,8 +260,44 @@ views:
             icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:pine-tree' }}"
             icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
             tap_action:
-              action: "more-info"
-              entity: "script.etherain_arroser_cedre"
+              action: "fire-dom-event"
+              browser_mod:
+                service: "browser_mod.sequence"
+                data:
+                  sequence:
+                    -
+                      service: "input_number.set_value"
+                      data:
+                        entity_id: "input_number.etherain_duree_manuelle"
+                        value: 1
+                    -
+                      service: "browser_mod.popup"
+                      data:
+                        title: "Cèdre"
+                        content:
+                          type: "custom:numberbox-card"
+                          entity: "input_number.etherain_duree_manuelle"
+                          name: false
+                          icon: false
+                          border: false
+                          unit: "min"
+                          card_mod:
+                            style: |-
+                              ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 8px; }
+                              .cur-box { display: flex; align-items: center; justify-content: center; gap: 28px; }
+                              .cur-num { font-size: 40px !important; font-weight: 500 !important; margin: 0 !important; line-height: 1.2 !important; }
+                              .cur-unit { font-size: 18px !important; margin-left: 4px; opacity: 0.6; }
+                              ha-icon { --mdc-icon-size: 28px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(33,150,243,0.12); color: rgb(33,150,243); cursor: pointer; padding: 0 !important; }
+                        right_button: "Arroser"
+                        right_button_variant: "brand"
+                        right_button_appearance: "accent"
+                        right_button_action:
+                          service: "script.etherain_arroser_duree_choisie"
+                          data:
+                            zone: 3
+                        left_button: "Annuler"
+                        left_button_variant: "neutral"
+                        left_button_appearance: "plain"
             hold_action:
               action: "none"
             card_mod:
@@ -204,8 +312,44 @@ views:
             icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:bed' }}"
             icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
             tap_action:
-              action: "more-info"
-              entity: "script.etherain_arroser_chambre"
+              action: "fire-dom-event"
+              browser_mod:
+                service: "browser_mod.sequence"
+                data:
+                  sequence:
+                    -
+                      service: "input_number.set_value"
+                      data:
+                        entity_id: "input_number.etherain_duree_manuelle"
+                        value: 1
+                    -
+                      service: "browser_mod.popup"
+                      data:
+                        title: "Chambre"
+                        content:
+                          type: "custom:numberbox-card"
+                          entity: "input_number.etherain_duree_manuelle"
+                          name: false
+                          icon: false
+                          border: false
+                          unit: "min"
+                          card_mod:
+                            style: |-
+                              ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 8px; }
+                              .cur-box { display: flex; align-items: center; justify-content: center; gap: 28px; }
+                              .cur-num { font-size: 40px !important; font-weight: 500 !important; margin: 0 !important; line-height: 1.2 !important; }
+                              .cur-unit { font-size: 18px !important; margin-left: 4px; opacity: 0.6; }
+                              ha-icon { --mdc-icon-size: 28px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(33,150,243,0.12); color: rgb(33,150,243); cursor: pointer; padding: 0 !important; }
+                        right_button: "Arroser"
+                        right_button_variant: "brand"
+                        right_button_appearance: "accent"
+                        right_button_action:
+                          service: "script.etherain_arroser_duree_choisie"
+                          data:
+                            zone: 4
+                        left_button: "Annuler"
+                        left_button_variant: "neutral"
+                        left_button_appearance: "plain"
             hold_action:
               action: "none"
             card_mod:
@@ -220,8 +364,44 @@ views:
             icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:water-opacity' }}"
             icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
             tap_action:
-              action: "more-info"
-              entity: "script.etherain_arroser_gouttes"
+              action: "fire-dom-event"
+              browser_mod:
+                service: "browser_mod.sequence"
+                data:
+                  sequence:
+                    -
+                      service: "input_number.set_value"
+                      data:
+                        entity_id: "input_number.etherain_duree_manuelle"
+                        value: 1
+                    -
+                      service: "browser_mod.popup"
+                      data:
+                        title: "Gouttes"
+                        content:
+                          type: "custom:numberbox-card"
+                          entity: "input_number.etherain_duree_manuelle"
+                          name: false
+                          icon: false
+                          border: false
+                          unit: "min"
+                          card_mod:
+                            style: |-
+                              ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 8px; }
+                              .cur-box { display: flex; align-items: center; justify-content: center; gap: 28px; }
+                              .cur-num { font-size: 40px !important; font-weight: 500 !important; margin: 0 !important; line-height: 1.2 !important; }
+                              .cur-unit { font-size: 18px !important; margin-left: 4px; opacity: 0.6; }
+                              ha-icon { --mdc-icon-size: 28px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(33,150,243,0.12); color: rgb(33,150,243); cursor: pointer; padding: 0 !important; }
+                        right_button: "Arroser"
+                        right_button_variant: "brand"
+                        right_button_appearance: "accent"
+                        right_button_action:
+                          service: "script.etherain_arroser_duree_choisie"
+                          data:
+                            zone: 5
+                        left_button: "Annuler"
+                        left_button_variant: "neutral"
+                        left_button_appearance: "plain"
             hold_action:
               action: "none"
             card_mod:

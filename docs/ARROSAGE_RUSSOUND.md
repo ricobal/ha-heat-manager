@@ -32,7 +32,9 @@ Les commandes restent dans la configuration globale (`rest.yaml`, non versionné
 - bandeau d'état avec bouton Stop (confirmation) et barre d'avancement des 5 zones, toujours affichée ;
 - cycles Court, Moyen et Long avec leur durée totale ; la roue crantée ouvre les durées des cycles ;
 - zones dans l'ordre du cycle : Bureau, Salon, Cèdre, Chambre, Gouttes. Pendant un cycle, chaque zone est « Terminé », « En cours » ou « À venir » ;
-- un appui sur une zone ouvre la fenêtre native du script `script.etherain_arroser_<zone>` (« Arroser Cèdre »…) : durée de 1 à 60 min, 1 min par défaut, puis « Exécuter ». Le script commun `script.etherain_arroser_zone` arrête un éventuel cycle puis lance la zone.
+- un appui sur une zone ouvre une fenêtre Browser Mod : nom de la zone, durée « − 1 min + » (`input_number.etherain_duree_manuelle`, remise à 1 min à chaque ouverture), boutons Annuler et Arroser. « Arroser » appelle `script.etherain_arroser_duree_choisie`, puis le script commun `script.etherain_arroser_zone` arrête un éventuel cycle et lance la zone. La fenêtre met 2 à 3 s à s'afficher.
+
+Prérequis : l'intégration HACS **Browser Mod** (aucun navigateur à enregistrer : la fenêtre s'ouvre dans le navigateur où l'on touche la zone) et la carte **numberbox-card**.
 
 card-mod ne s'applique pas directement à une carte `grid` du tableau de bord : les grilles stylées sont enveloppées dans `custom:mod-card`.
 

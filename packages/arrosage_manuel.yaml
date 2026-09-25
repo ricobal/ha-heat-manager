@@ -1,6 +1,16 @@
-# Arrosage manuel d'une zone depuis l'écran Arrosage (2026-09-25)
-# Un appui sur une zone ouvre la fenêtre du script « Arroser <zone> » :
-# durée réglable (1 min par défaut) puis « Exécuter ».
+# Arrosage manuel d'une zone depuis l'écran Arrosage (2026-09-26)
+# Un appui sur une zone ouvre une fenêtre Browser Mod : nom de la zone, durée
+# (− / +, remise à 1 min à chaque ouverture), boutons Annuler et Arroser.
+
+input_number:
+  etherain_duree_manuelle:
+    name: Etherain durée manuelle
+    min: 1
+    max: 60
+    step: 1
+    mode: box
+    unit_of_measurement: min
+    icon: mdi:timer-outline
 
 rest_command:
   etherain_irrigation_zone_manuel:
@@ -56,53 +66,20 @@ script:
           zone: "{{ zone | int }}"
           duree: "{{ duree | int }}"
 
-  etherain_arroser_bureau: &arroser
-    alias: Arroser Bureau
-    icon: mdi:briefcase
+  etherain_arroser_duree_choisie:
+    alias: Etherain arroser une zone (durée de la fenêtre)
+    icon: mdi:sprinkler-variant
     mode: single
     fields:
-      duree:
-        name: Durée
+      zone:
+        name: Zone
         required: true
-        default: 1
         selector:
           number:
             min: 1
-            max: 60
-            mode: slider
-            unit_of_measurement: min
-    variables:
-      zone: 1
+            max: 5
     sequence:
       - action: script.etherain_arroser_zone
         data:
-          zone: "{{ zone }}"
-          duree: "{{ duree | default(1) }}"
-
-  etherain_arroser_salon:
-    <<: *arroser
-    alias: Arroser Salon
-    icon: mdi:sofa
-    variables:
-      zone: 2
-
-  etherain_arroser_cedre:
-    <<: *arroser
-    alias: Arroser Cèdre
-    icon: mdi:pine-tree
-    variables:
-      zone: 3
-
-  etherain_arroser_chambre:
-    <<: *arroser
-    alias: Arroser Chambre
-    icon: mdi:bed
-    variables:
-      zone: 4
-
-  etherain_arroser_gouttes:
-    <<: *arroser
-    alias: Arroser Gouttes
-    icon: mdi:water-opacity
-    variables:
-      zone: 5
+          zone: "{{ zone | int }}"
+          duree: "{{ states('input_number.etherain_duree_manuelle') | int(1) }}"

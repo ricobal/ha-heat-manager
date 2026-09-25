@@ -3,8 +3,8 @@
 The view is written to `lovelace/arrosage_view.yaml`; replacing the `arrosage`
 view of the storage-mode dashboard is done separately.  It never writes to
 Home Assistant.  It relies on the rest sensors of `packages/remplacement_nodered.yaml`,
-on the `script.etherain_arroser_*` scripts of `packages/arrosage_manuel.yaml` and on
-the Mushroom and card-mod (mod-card) cards.
+on `packages/arrosage_manuel.yaml`, on Browser Mod (zone pop-up) and on the Mushroom,
+numberbox and card-mod (mod-card) cards.
 """
 
 import json
@@ -103,9 +103,32 @@ def cycles():
     return [title, {"type": "grid", "columns": 3, "square": False, "cards": cards}]
 
 
+DUREE = "input_number.etherain_duree_manuelle"
+POPUP_CSS = (
+    "ha-card { background: none; box-shadow: none; border: none; padding: 12px 0 8px; }\n"
+    ".cur-box { display: flex; align-items: center; justify-content: center; gap: 28px; }\n"
+    ".cur-num { font-size: 40px !important; font-weight: 500 !important; margin: 0 !important; line-height: 1.2 !important; }\n"
+    ".cur-unit { font-size: 18px !important; margin-left: 4px; opacity: 0.6; }\n"
+    "ha-icon { --mdc-icon-size: 28px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;"
+    f" border-radius: 50%; background: rgba({BLUE},0.12); color: rgb({BLUE}); cursor: pointer; padding: 0 !important; }}")
+
+
+def zone_popup(z, nom):
+    # Fenêtre Browser Mod : durée remise à 1 min, − / +, Annuler et Arroser.
+    return {"action": "fire-dom-event", "browser_mod": {"service": "browser_mod.sequence", "data": {"sequence": [
+        {"service": "input_number.set_value", "data": {"entity_id": DUREE, "value": 1}},
+        {"service": "browser_mod.popup", "data": {
+            "title": nom,
+            "content": {"type": "custom:numberbox-card", "entity": DUREE, "name": False, "icon": False,
+                        "border": False, "unit": "min", "card_mod": {"style": POPUP_CSS}},
+            "right_button": "Arroser", "right_button_variant": "brand", "right_button_appearance": "accent",
+            "right_button_action": {"service": "script.etherain_arroser_duree_choisie", "data": {"zone": z}},
+            "left_button": "Annuler", "left_button_variant": "neutral", "left_button_appearance": "plain"}}]}}}
+
+
 def zones():
     cards = [{"type": "custom:mushroom-title-card", "subtitle": "Zones"}]
-    for z, nom, icon, slug in ZONES:
+    for z, nom, icon, _ in ZONES:
         d = DUR.format(z=z)
         st = PRE + f"{{% set st = 'cours' if cur == {z} else ('fait' if cyc and run and cur > {z} else ('avenir' if cyc and run else 'repos')) %}}"
         cards.append(tpl_card(
@@ -116,8 +139,7 @@ def zones():
             f"{{% else %}}Zone {z}{{% endif %}}",
             icon=st + f"{{{{ 'mdi:check' if st == 'fait' else '{icon}' }}}}",
             icon_color=st + "{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}",
-            # La fenêtre du script « Arroser <zone> » demande la durée puis lance la zone
-            tap_action={"action": "more-info", "entity": f"script.etherain_arroser_{slug}"},
+            tap_action=zone_popup(z, nom),
             hold_action={"action": "none"},
             card_mod={"style": {
                 "mushroom-shape-icon$": st + "{% if st == 'cours' %}" + PULSE + "{% endif %}",
