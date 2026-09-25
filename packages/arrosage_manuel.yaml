@@ -1,0 +1,109 @@
+# Arrosage manuel d'une zone depuis l'écran Arrosage (2026-09-25)
+# Un appui sur une zone ouvre un sélecteur de durée, initialisé à 1 min.
+
+input_number:
+  etherain_zone_selectionnee:
+    name: Etherain zone sélectionnée (écran)
+    min: 0
+    max: 5
+    step: 1
+    mode: box
+    icon: mdi:numeric
+  etherain_duree_manuelle:
+    name: Etherain durée manuelle
+    min: 1
+    max: 60
+    step: 1
+    mode: box
+    unit_of_measurement: min
+    icon: mdi:timer-outline
+
+rest_command:
+  etherain_irrigation_zone_manuel:
+    url: >-
+      http://192.168.1.81/result.cgi?xi=0:{% for z in range(1, 9) %}{{ duree | int if z == zone | int else 0 }}{{ ':' if not loop.last }}{% endfor %}
+
+script:
+  etherain_choisir_zone:
+    alias: Etherain choisir zone (écran)
+    icon: mdi:gesture-tap
+    mode: restart
+    fields:
+      zone:
+        name: Zone
+        required: true
+        selector:
+          number:
+            min: 1
+            max: 5
+    sequence:
+      - if:
+          - condition: template
+            value_template: "{{ states('input_number.etherain_zone_selectionnee') | int(0) == zone | int }}"
+        then:
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.etherain_zone_selectionnee
+            data:
+              value: 0
+        else:
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.etherain_duree_manuelle
+            data:
+              value: 1
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.etherain_zone_selectionnee
+            data:
+              value: "{{ zone | int }}"
+
+  etherain_annuler_zone:
+    alias: Etherain annuler choix zone (écran)
+    icon: mdi:close
+    mode: single
+    sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.etherain_zone_selectionnee
+        data:
+          value: 0
+
+  etherain_arroser_zone_manuel:
+    alias: Etherain arroser zone (durée choisie)
+    icon: mdi:sprinkler
+    mode: single
+    sequence:
+      - variables:
+          zone: "{{ states('input_number.etherain_zone_selectionnee') | int(0) }}"
+          duree: "{{ states('input_number.etherain_duree_manuelle') | int(0) }}"
+      - condition: template
+        value_template: "{{ 1 <= zone <= 5 and duree > 0 }}"
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.etherain_zone_selectionnee
+        data:
+          value: 0
+      # Un cycle en cours est arrêté proprement (ses automatisations envoient l'arrêt)
+      - if:
+          - condition: state
+            entity_id:
+              - input_boolean.etherain_cycle_court
+              - input_boolean.etherain_cycle_moyen
+              - input_boolean.etherain_cycle_long
+            match: any
+            state: "on"
+        then:
+          - action: input_boolean.turn_off
+            target:
+              entity_id:
+                - input_boolean.etherain_cycle_court
+                - input_boolean.etherain_cycle_moyen
+                - input_boolean.etherain_cycle_long
+          - delay: 3
+      - action: rest_command.etherain_login
+      - action: rest_command.etherain_stop_irrigation
+      - action: rest_command.etherain_irrigation_zone_manuel
+        data:
+          zone: "{{ zone }}"
+          duree: "{{ duree }}"

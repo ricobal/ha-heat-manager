@@ -1,0 +1,36 @@
+# Remplacement des flux Node-RED (2026-09-25)
+# - Etherain : lecture de l'état de l'arrosage (remplace le sondage Node-RED)
+# - Russound : envoi d'un numéro de station (utilisé par les scripts radio_*)
+
+rest:
+  - resource: http://192.168.1.81/result.cgi?xs
+    scan_interval: 10
+    timeout: 5
+    sensor:
+      - name: Etherain statut irrigation HA
+        unique_id: etherain_statut_irrigation_rest
+        icon: mdi:sprinkler-variant
+        value_template: >-
+          {% set c = (value | regex_findall('os:\s*(\w+)') | first) | default('') %}
+          {{ {'RD': 'Arrêté', 'WT': 'Arrosage programmé', 'BZ': 'Arrosage en cours'}.get(c, c) if c else 'unknown' }}
+      - name: Etherain statut commande irrigation HA
+        unique_id: etherain_statut_commande_irrigation_rest
+        icon: mdi:console
+        value_template: >-
+          {% set c = (value | regex_findall('cs:\s*(\w+)') | first) | default('') %}
+          {{ {'OK': 'Ok', 'ER': 'Erreur', 'NA': 'Non autorisée'}.get(c, c) if c else 'unknown' }}
+      - name: Etherain résultat commande irrigation HA
+        unique_id: etherain_resultat_commande_irrigation_rest
+        icon: mdi:clipboard-check-outline
+        value_template: >-
+          {% set c = (value | regex_findall('rz:\s*(\w+)') | first) | default('') %}
+          {{ {'OK': 'Ok', 'RN': 'Interrompu par pluie', 'SH': 'Problème valve', 'NC': 'Interrompu'}.get(c, c) if c else 'unknown' }}
+      - name: Etherain dernière zone arrosée HA
+        unique_id: etherain_derniere_zone_arrosee_rest
+        icon: mdi:numeric
+        value_template: >-
+          {% set c = (value | regex_findall('ri:\s*(\d+)') | first) | default('') %}
+          {{ (c | int + 1) if c else 'unknown' }}
+
+shell_command:
+  russound_touche: "python3 /config/shell/russound_touche.py {{ touche }}"

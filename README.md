@@ -39,6 +39,8 @@ Les synthèses de zone sont calculées directement dans les cartes à partir des
 
 Le fichier Lovelace est généré. Modifiez le générateur puis relancez-le au lieu d’éditer directement le fichier YAML produit.
 
+Le dépôt contient aussi l’arrosage Etherain et la radio Russound, qui remplacent Node-RED : voir `docs/ARROSAGE_RUSSOUND.md`.
+
 ## Prérequis
 
 - Home Assistant avec prise en charge des vues Sections ;

@@ -1,0 +1,460 @@
+# Arrosage — vue générée par tools/generate_arrosage_dashboard.py
+# Remplacer la vue « arrosage » du tableau de bord lovelace-mobile après validation.
+
+views:
+  -
+    theme: "Backend-selected"
+    title: "arrosage"
+    path: "arrosage"
+    badges:
+    background: "#e4e9f0"
+    cards:
+      -
+        type: "grid"
+        columns: 1
+        square: false
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+          -
+            type: "custom:mod-card"
+            card:
+              type: "grid"
+              columns: 2
+              square: false
+              cards:
+                -
+                  type: "custom:mushroom-legacy-template-card"
+                  entity: "sensor.etherain_statut_irrigation"
+                  icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{{ 'mdi:water' if run else 'mdi:water-off' }}"
+                  icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{{ 'blue' if run else ('amber' if is_state('sensor.etherain_statut_irrigation','Arrosage programmé') else 'grey') }}"
+                  primary: "{{ states('sensor.etherain_statut_irrigation') }}"
+                  secondary: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set noms = [\"\", \"Bureau\", \"Salon\", \"Cèdre\", \"Chambre\", \"Gouttes\"] %}{% if run and cyc %}Cycle {{ cyc }} · zone {{ cur }} sur 5 · {{ noms[cur] if cur <= 5 else '' }}{% elif run %}Arrosage manuel · {{ noms[cur] if 1 <= cur <= 5 else 'zone ' ~ cur }}{% else %}Dernier arrosage : {{ states('sensor.etherain_resultat_commande_irrigation') }}{% endif %}"
+                  tap_action:
+                    action: "none"
+                  hold_action:
+                    action: "none"
+                  card_mod:
+                    style:
+                      mushroom-shape-icon$: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% if run %}.shape { animation: pulse 1.4s ease-in-out infinite; }@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }{% endif %}"
+                      .: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set ns = namespace(pos=0, tot=0, g=[]) %}{% if run and cyc %}{% for z in range(1,6) %}{% set ns.tot = ns.tot + (states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_' ~ z)|int(0)) %}{% endfor %}{% endif %}{% set parcycle = run and cyc and ns.tot > 0 %}{% for z in range(1,6) %}{% set d = (states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_' ~ z)|int(0)) if parcycle else 1 %}{% set a = ns.pos %}{% set ns.pos = ns.pos + d / (ns.tot if parcycle else 5) * 100 %}{% set col = 'rgb(33,150,243)' if (parcycle and z < cur) else 'rgba(33,150,243,0.45)' if z == cur else 'rgba(0,0,0,0.10)' %}{% set b = [ns.pos - 1, a]|max %}{% set ns.g = ns.g + [col ~ ' ' ~ a|round(2) ~ '%', col ~ ' ' ~ b|round(2) ~ '%', 'transparent ' ~ b|round(2) ~ '%', 'transparent ' ~ ns.pos|round(2) ~ '%'] %}{% endfor %}ha-card:after { content: ''; display: block; height: 6px; margin: 0 14px 14px; border-radius: 3px; background: linear-gradient(to right, {{ ns.g|join(', ') }}); }{% if run %}ha-card { border: 1.5px solid rgb(33,150,243); }{% endif %}"
+                -
+                  type: "custom:mushroom-legacy-template-card"
+                  icon: "mdi:stop"
+                  icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{{ 'red' if run else 'grey' }}"
+                  layout: "vertical"
+                  primary: ""
+                  secondary: ""
+                  tap_action:
+                    action: "perform-action"
+                    perform_action: "script.etherain_arreter_arrosage_boolean_a_off"
+                    confirmation:
+                      text: "Arrêter l'arrosage ?"
+                  card_mod:
+                    style:
+                      .: "ha-card { height: 100% !important; justify-content: center; }"
+            card_mod:
+              style:
+                hui-grid-card$: |-
+                  #root { grid-template-columns: 1fr 72px !important; align-items: stretch; }
+                  #root > hui-card { display: block; height: 100%; }
+                  #root > hui-card > * { display: block; height: 100%; }
+                .: "ha-card { background: none; border: none; box-shadow: none; }"
+          -
+            type: "custom:mod-card"
+            card:
+              type: "grid"
+              columns: 2
+              square: false
+              cards:
+                -
+                  type: "custom:mushroom-title-card"
+                  subtitle: "Lancer un cycle"
+                -
+                  type: "custom:mushroom-chips-card"
+                  alignment: "end"
+                  card_mod:
+                    style: "ha-card { padding-bottom: 6px; }"
+                  chips:
+                    -
+                      type: "action"
+                      icon: "mdi:cog"
+                      tap_action:
+                        action: "navigate"
+                        navigation_path: "parametres-arrosage"
+            card_mod:
+              style:
+                hui-grid-card$: "#root { grid-template-columns: 1fr auto !important; align-items: end; }"
+                .: "ha-card { background: none; border: none; box-shadow: none; }"
+          -
+            type: "grid"
+            columns: 3
+            square: false
+            cards:
+              -
+                type: "custom:mushroom-legacy-template-card"
+                entity: "input_boolean.etherain_cycle_court"
+                primary: "Court"
+                secondary: "{{ states('input_number.etherain_temps_arrosage_cycle_court_zone_1')|int(0) + states('input_number.etherain_temps_arrosage_cycle_court_zone_2')|int(0) + states('input_number.etherain_temps_arrosage_cycle_court_zone_3')|int(0) + states('input_number.etherain_temps_arrosage_cycle_court_zone_4')|int(0) + states('input_number.etherain_temps_arrosage_cycle_court_zone_5')|int(0) }} min"
+                icon: "mdi:timer-sand"
+                icon_color: "{{ 'blue' if is_state('input_boolean.etherain_cycle_court','on') else 'grey' }}"
+                layout: "vertical"
+                tap_action:
+                  action: "toggle"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style:
+                    .: "{% if is_state('input_boolean.etherain_cycle_court','on') %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% endif %}"
+              -
+                type: "custom:mushroom-legacy-template-card"
+                entity: "input_boolean.etherain_cycle_moyen"
+                primary: "Moyen"
+                secondary: "{{ states('input_number.etherain_temps_arrosage_cycle_moyen_zone_1')|int(0) + states('input_number.etherain_temps_arrosage_cycle_moyen_zone_2')|int(0) + states('input_number.etherain_temps_arrosage_cycle_moyen_zone_3')|int(0) + states('input_number.etherain_temps_arrosage_cycle_moyen_zone_4')|int(0) + states('input_number.etherain_temps_arrosage_cycle_moyen_zone_5')|int(0) }} min"
+                icon: "mdi:timer-outline"
+                icon_color: "{{ 'blue' if is_state('input_boolean.etherain_cycle_moyen','on') else 'grey' }}"
+                layout: "vertical"
+                tap_action:
+                  action: "toggle"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style:
+                    .: "{% if is_state('input_boolean.etherain_cycle_moyen','on') %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% endif %}"
+              -
+                type: "custom:mushroom-legacy-template-card"
+                entity: "input_boolean.etherain_cycle_long"
+                primary: "Long"
+                secondary: "{{ states('input_number.etherain_temps_arrosage_cycle_long_zone_1')|int(0) + states('input_number.etherain_temps_arrosage_cycle_long_zone_2')|int(0) + states('input_number.etherain_temps_arrosage_cycle_long_zone_3')|int(0) + states('input_number.etherain_temps_arrosage_cycle_long_zone_4')|int(0) + states('input_number.etherain_temps_arrosage_cycle_long_zone_5')|int(0) }} min"
+                icon: "mdi:timer-plus-outline"
+                icon_color: "{{ 'blue' if is_state('input_boolean.etherain_cycle_long','on') else 'grey' }}"
+                layout: "vertical"
+                tap_action:
+                  action: "toggle"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style:
+                    .: "{% if is_state('input_boolean.etherain_cycle_long','on') %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% endif %}"
+          -
+            type: "custom:mushroom-title-card"
+            subtitle: "Zones"
+          -
+            type: "custom:mushroom-legacy-template-card"
+            entity: "binary_sensor.etherain_etat_zone_1"
+            primary: "Bureau"
+            secondary: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}En cours{{ ' · ' ~ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_1')|int(0) ~ ' min' if cyc else '' }}{% elif st == 'fait' %}Terminé · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_1')|int(0) }} min{% elif st == 'avenir' %}À venir · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_1')|int(0) }} min{% else %}Zone 1{% endif %}"
+            icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:briefcase' }}"
+            icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.etherain_choisir_zone"
+              data:
+                zone: 1
+            hold_action:
+              action: "none"
+            card_mod:
+              style:
+                mushroom-shape-icon$: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}.shape { animation: pulse 1.4s ease-in-out infinite; }@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }{% endif %}"
+                .: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 1 else ('fait' if cyc and run and cur > 1 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% elif states('input_number.etherain_zone_selectionnee')|int(0) == 1 %}ha-card { border: 2px solid rgba(33,150,243,0.6); }{% endif %}"
+          -
+            type: "conditional"
+            conditions:
+              -
+                condition: "state"
+                entity: "input_number.etherain_zone_selectionnee"
+                state: "1.0"
+            card:
+              type: "vertical-stack"
+              cards:
+                -
+                  type: "custom:numberbox-card"
+                  entity: "input_number.etherain_duree_manuelle"
+                  name: "Durée · Bureau"
+                  icon: "mdi:timer-outline"
+                  border: true
+                -
+                  type: "grid"
+                  columns: 2
+                  square: false
+                  cards:
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Arroser"
+                      icon: "mdi:sprinkler-variant"
+                      icon_color: "blue"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_arroser_zone_manuel"
+                      hold_action:
+                        action: "none"
+                      card_mod:
+                        style:
+                          .: "ha-card { background: rgba(33,150,243,0.12); }"
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Annuler"
+                      icon: "mdi:close"
+                      icon_color: "grey"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_annuler_zone"
+                      hold_action:
+                        action: "none"
+          -
+            type: "custom:mushroom-legacy-template-card"
+            entity: "binary_sensor.etherain_etat_zone_2"
+            primary: "Salon"
+            secondary: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}En cours{{ ' · ' ~ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_2')|int(0) ~ ' min' if cyc else '' }}{% elif st == 'fait' %}Terminé · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_2')|int(0) }} min{% elif st == 'avenir' %}À venir · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_2')|int(0) }} min{% else %}Zone 2{% endif %}"
+            icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:sofa' }}"
+            icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.etherain_choisir_zone"
+              data:
+                zone: 2
+            hold_action:
+              action: "none"
+            card_mod:
+              style:
+                mushroom-shape-icon$: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}.shape { animation: pulse 1.4s ease-in-out infinite; }@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }{% endif %}"
+                .: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 2 else ('fait' if cyc and run and cur > 2 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% elif states('input_number.etherain_zone_selectionnee')|int(0) == 2 %}ha-card { border: 2px solid rgba(33,150,243,0.6); }{% endif %}"
+          -
+            type: "conditional"
+            conditions:
+              -
+                condition: "state"
+                entity: "input_number.etherain_zone_selectionnee"
+                state: "2.0"
+            card:
+              type: "vertical-stack"
+              cards:
+                -
+                  type: "custom:numberbox-card"
+                  entity: "input_number.etherain_duree_manuelle"
+                  name: "Durée · Salon"
+                  icon: "mdi:timer-outline"
+                  border: true
+                -
+                  type: "grid"
+                  columns: 2
+                  square: false
+                  cards:
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Arroser"
+                      icon: "mdi:sprinkler-variant"
+                      icon_color: "blue"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_arroser_zone_manuel"
+                      hold_action:
+                        action: "none"
+                      card_mod:
+                        style:
+                          .: "ha-card { background: rgba(33,150,243,0.12); }"
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Annuler"
+                      icon: "mdi:close"
+                      icon_color: "grey"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_annuler_zone"
+                      hold_action:
+                        action: "none"
+          -
+            type: "custom:mushroom-legacy-template-card"
+            entity: "binary_sensor.etherain_etat_zone_3"
+            primary: "Cèdre"
+            secondary: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}En cours{{ ' · ' ~ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_3')|int(0) ~ ' min' if cyc else '' }}{% elif st == 'fait' %}Terminé · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_3')|int(0) }} min{% elif st == 'avenir' %}À venir · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_3')|int(0) }} min{% else %}Zone 3{% endif %}"
+            icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:pine-tree' }}"
+            icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.etherain_choisir_zone"
+              data:
+                zone: 3
+            hold_action:
+              action: "none"
+            card_mod:
+              style:
+                mushroom-shape-icon$: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}.shape { animation: pulse 1.4s ease-in-out infinite; }@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }{% endif %}"
+                .: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 3 else ('fait' if cyc and run and cur > 3 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% elif states('input_number.etherain_zone_selectionnee')|int(0) == 3 %}ha-card { border: 2px solid rgba(33,150,243,0.6); }{% endif %}"
+          -
+            type: "conditional"
+            conditions:
+              -
+                condition: "state"
+                entity: "input_number.etherain_zone_selectionnee"
+                state: "3.0"
+            card:
+              type: "vertical-stack"
+              cards:
+                -
+                  type: "custom:numberbox-card"
+                  entity: "input_number.etherain_duree_manuelle"
+                  name: "Durée · Cèdre"
+                  icon: "mdi:timer-outline"
+                  border: true
+                -
+                  type: "grid"
+                  columns: 2
+                  square: false
+                  cards:
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Arroser"
+                      icon: "mdi:sprinkler-variant"
+                      icon_color: "blue"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_arroser_zone_manuel"
+                      hold_action:
+                        action: "none"
+                      card_mod:
+                        style:
+                          .: "ha-card { background: rgba(33,150,243,0.12); }"
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Annuler"
+                      icon: "mdi:close"
+                      icon_color: "grey"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_annuler_zone"
+                      hold_action:
+                        action: "none"
+          -
+            type: "custom:mushroom-legacy-template-card"
+            entity: "binary_sensor.etherain_etat_zone_4"
+            primary: "Chambre"
+            secondary: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}En cours{{ ' · ' ~ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_4')|int(0) ~ ' min' if cyc else '' }}{% elif st == 'fait' %}Terminé · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_4')|int(0) }} min{% elif st == 'avenir' %}À venir · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_4')|int(0) }} min{% else %}Zone 4{% endif %}"
+            icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:bed' }}"
+            icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.etherain_choisir_zone"
+              data:
+                zone: 4
+            hold_action:
+              action: "none"
+            card_mod:
+              style:
+                mushroom-shape-icon$: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}.shape { animation: pulse 1.4s ease-in-out infinite; }@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }{% endif %}"
+                .: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 4 else ('fait' if cyc and run and cur > 4 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% elif states('input_number.etherain_zone_selectionnee')|int(0) == 4 %}ha-card { border: 2px solid rgba(33,150,243,0.6); }{% endif %}"
+          -
+            type: "conditional"
+            conditions:
+              -
+                condition: "state"
+                entity: "input_number.etherain_zone_selectionnee"
+                state: "4.0"
+            card:
+              type: "vertical-stack"
+              cards:
+                -
+                  type: "custom:numberbox-card"
+                  entity: "input_number.etherain_duree_manuelle"
+                  name: "Durée · Chambre"
+                  icon: "mdi:timer-outline"
+                  border: true
+                -
+                  type: "grid"
+                  columns: 2
+                  square: false
+                  cards:
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Arroser"
+                      icon: "mdi:sprinkler-variant"
+                      icon_color: "blue"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_arroser_zone_manuel"
+                      hold_action:
+                        action: "none"
+                      card_mod:
+                        style:
+                          .: "ha-card { background: rgba(33,150,243,0.12); }"
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Annuler"
+                      icon: "mdi:close"
+                      icon_color: "grey"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_annuler_zone"
+                      hold_action:
+                        action: "none"
+          -
+            type: "custom:mushroom-legacy-template-card"
+            entity: "binary_sensor.etherain_etat_zone_5"
+            primary: "Gouttes"
+            secondary: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}En cours{{ ' · ' ~ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_5')|int(0) ~ ' min' if cyc else '' }}{% elif st == 'fait' %}Terminé · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_5')|int(0) }} min{% elif st == 'avenir' %}À venir · {{ states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_5')|int(0) }} min{% else %}Zone 5{% endif %}"
+            icon: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{{ 'mdi:check' if st == 'fait' else 'mdi:water-opacity' }}"
+            icon_color: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}"
+            tap_action:
+              action: "perform-action"
+              perform_action: "script.etherain_choisir_zone"
+              data:
+                zone: 5
+            hold_action:
+              action: "none"
+            card_mod:
+              style:
+                mushroom-shape-icon$: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}.shape { animation: pulse 1.4s ease-in-out infinite; }@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }{% endif %}"
+                .: "{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en cours') %}{% set cur = states('sensor.etherain_derniere_zone_arrosee')|int(0) if run else 0 %}{% set cyc = 'court' if is_state('input_boolean.etherain_cycle_court','on') else 'moyen' if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' if is_state('input_boolean.etherain_cycle_long','on') else '' %}{% set st = 'cours' if cur == 5 else ('fait' if cyc and run and cur > 5 else ('avenir' if cyc and run else 'repos')) %}{% if st == 'cours' %}ha-card { border: 2px solid rgb(33,150,243); background: rgba(33,150,243,0.08); }{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% elif states('input_number.etherain_zone_selectionnee')|int(0) == 5 %}ha-card { border: 2px solid rgba(33,150,243,0.6); }{% endif %}"
+          -
+            type: "conditional"
+            conditions:
+              -
+                condition: "state"
+                entity: "input_number.etherain_zone_selectionnee"
+                state: "5.0"
+            card:
+              type: "vertical-stack"
+              cards:
+                -
+                  type: "custom:numberbox-card"
+                  entity: "input_number.etherain_duree_manuelle"
+                  name: "Durée · Gouttes"
+                  icon: "mdi:timer-outline"
+                  border: true
+                -
+                  type: "grid"
+                  columns: 2
+                  square: false
+                  cards:
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Arroser"
+                      icon: "mdi:sprinkler-variant"
+                      icon_color: "blue"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_arroser_zone_manuel"
+                      hold_action:
+                        action: "none"
+                      card_mod:
+                        style:
+                          .: "ha-card { background: rgba(33,150,243,0.12); }"
+                    -
+                      type: "custom:mushroom-legacy-template-card"
+                      primary: "Annuler"
+                      icon: "mdi:close"
+                      icon_color: "grey"
+                      tap_action:
+                        action: "perform-action"
+                        perform_action: "script.etherain_annuler_zone"
+                      hold_action:
+                        action: "none"
