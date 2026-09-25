@@ -3,8 +3,8 @@
 The view is written to `lovelace/arrosage_view.yaml`; replacing the `arrosage`
 view of the storage-mode dashboard is done separately.  It never writes to
 Home Assistant.  It relies on the rest sensors of `packages/remplacement_nodered.yaml`,
-on `packages/arrosage_manuel.yaml` and on the Mushroom, card-mod (mod-card) and
-numberbox cards.
+on the `script.etherain_arroser_*` scripts of `packages/arrosage_manuel.yaml` and on
+the Mushroom and card-mod (mod-card) cards.
 """
 
 import json
@@ -16,8 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "lovelace" / "arrosage_view.yaml"
 
 # Ordre du cycle : l'Etherain arrose les zones dans cet ordre.
-ZONES = [(1, "Bureau", "mdi:briefcase"), (2, "Salon", "mdi:sofa"), (3, "Cèdre", "mdi:pine-tree"),
-         (4, "Chambre", "mdi:bed"), (5, "Gouttes", "mdi:water-opacity")]
+ZONES = [(1, "Bureau", "mdi:briefcase", "bureau"), (2, "Salon", "mdi:sofa", "salon"),
+         (3, "Cèdre", "mdi:pine-tree", "cedre"), (4, "Chambre", "mdi:bed", "chambre"),
+         (5, "Gouttes", "mdi:water-opacity", "gouttes")]
 BLUE = "33,150,243"
 
 # Variables communes à tous les modèles : arrosage en cours, zone en cours, cycle actif.
@@ -27,7 +28,7 @@ PRE = ("{% set run = is_state('sensor.etherain_statut_irrigation','Arrosage en c
        "if is_state('input_boolean.etherain_cycle_moyen','on') else 'long' "
        "if is_state('input_boolean.etherain_cycle_long','on') else '' %}")
 DUR = "states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_{z}')|int(0)"
-NOMS = "{% set noms = " + json.dumps(["", *[n for _, n, _ in ZONES]], ensure_ascii=False) + " %}"
+NOMS = "{% set noms = " + json.dumps(["", *[z[1] for z in ZONES]], ensure_ascii=False) + " %}"
 PULSE = ".shape { animation: pulse 1.4s ease-in-out infinite; }" \
         "@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }"
 
@@ -104,9 +105,8 @@ def cycles():
 
 def zones():
     cards = [{"type": "custom:mushroom-title-card", "subtitle": "Zones"}]
-    for z, nom, icon in ZONES:
+    for z, nom, icon, slug in ZONES:
         d = DUR.format(z=z)
-        sel = f"states('input_number.etherain_zone_selectionnee')|int(0) == {z}"
         st = PRE + f"{{% set st = 'cours' if cur == {z} else ('fait' if cyc and run and cur > {z} else ('avenir' if cyc and run else 'repos')) %}}"
         cards.append(tpl_card(
             entity=f"binary_sensor.etherain_etat_zone_{z}", primary=nom,
@@ -116,28 +116,13 @@ def zones():
             f"{{% else %}}Zone {z}{{% endif %}}",
             icon=st + f"{{{{ 'mdi:check' if st == 'fait' else '{icon}' }}}}",
             icon_color=st + "{{ 'blue' if st == 'cours' else ('green' if st == 'fait' else 'grey') }}",
-            tap_action={"action": "perform-action", "perform_action": "script.etherain_choisir_zone", "data": {"zone": z}},
+            # La fenêtre du script « Arroser <zone> » demande la durée puis lance la zone
+            tap_action={"action": "more-info", "entity": f"script.etherain_arroser_{slug}"},
             hold_action={"action": "none"},
             card_mod={"style": {
                 "mushroom-shape-icon$": st + "{% if st == 'cours' %}" + PULSE + "{% endif %}",
                 ".": st + f"{{% if st == 'cours' %}}ha-card {{ border: 2px solid rgb({BLUE}); background: rgba({BLUE},0.08); }}"
-                "{% elif st == 'fait' %}ha-card { opacity: 0.75; }"
-                f"{{% elif {sel} %}}ha-card {{ border: 2px solid rgba({BLUE},0.6); }}{{% endif %}}"}}))
-        # Sélecteur de durée affiché sous la zone touchée
-        cards.append({
-            "type": "conditional",
-            "conditions": [{"condition": "state", "entity": "input_number.etherain_zone_selectionnee", "state": f"{z}.0"}],
-            "card": {"type": "vertical-stack", "cards": [
-                {"type": "custom:numberbox-card", "entity": "input_number.etherain_duree_manuelle",
-                 "name": f"Durée · {nom}", "icon": "mdi:timer-outline", "border": True},
-                {"type": "grid", "columns": 2, "square": False, "cards": [
-                    tpl_card(primary="Arroser", icon="mdi:sprinkler-variant", icon_color="blue",
-                             tap_action={"action": "perform-action", "perform_action": "script.etherain_arroser_zone_manuel"},
-                             hold_action={"action": "none"},
-                             card_mod={"style": {".": f"ha-card {{ background: rgba({BLUE},0.12); }}"}}),
-                    tpl_card(primary="Annuler", icon="mdi:close", icon_color="grey",
-                             tap_action={"action": "perform-action", "perform_action": "script.etherain_annuler_zone"},
-                             hold_action={"action": "none"})]}]}})
+                "{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% endif %}"}}))
     return cards
 
 

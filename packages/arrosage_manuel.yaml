@@ -1,22 +1,6 @@
 # Arrosage manuel d'une zone depuis l'écran Arrosage (2026-09-25)
-# Un appui sur une zone ouvre un sélecteur de durée, initialisé à 1 min.
-
-input_number:
-  etherain_zone_selectionnee:
-    name: Etherain zone sélectionnée (écran)
-    min: 0
-    max: 5
-    step: 1
-    mode: box
-    icon: mdi:numeric
-  etherain_duree_manuelle:
-    name: Etherain durée manuelle
-    min: 1
-    max: 60
-    step: 1
-    mode: box
-    unit_of_measurement: min
-    icon: mdi:timer-outline
+# Un appui sur une zone ouvre la fenêtre du script « Arroser <zone> » :
+# durée réglable (1 min par défaut) puis « Exécuter ».
 
 rest_command:
   etherain_irrigation_zone_manuel:
@@ -24,10 +8,10 @@ rest_command:
       http://192.168.1.81/result.cgi?xi=0:{% for z in range(1, 9) %}{{ duree | int if z == zone | int else 0 }}{{ ':' if not loop.last }}{% endfor %}
 
 script:
-  etherain_choisir_zone:
-    alias: Etherain choisir zone (écran)
-    icon: mdi:gesture-tap
-    mode: restart
+  etherain_arroser_zone:
+    alias: Etherain arroser une zone
+    icon: mdi:sprinkler
+    mode: single
     fields:
       zone:
         name: Zone
@@ -36,54 +20,18 @@ script:
           number:
             min: 1
             max: 5
+      duree:
+        name: Durée
+        required: true
+        default: 1
+        selector:
+          number:
+            min: 1
+            max: 60
+            unit_of_measurement: min
     sequence:
-      - if:
-          - condition: template
-            value_template: "{{ states('input_number.etherain_zone_selectionnee') | int(0) == zone | int }}"
-        then:
-          - action: input_number.set_value
-            target:
-              entity_id: input_number.etherain_zone_selectionnee
-            data:
-              value: 0
-        else:
-          - action: input_number.set_value
-            target:
-              entity_id: input_number.etherain_duree_manuelle
-            data:
-              value: 1
-          - action: input_number.set_value
-            target:
-              entity_id: input_number.etherain_zone_selectionnee
-            data:
-              value: "{{ zone | int }}"
-
-  etherain_annuler_zone:
-    alias: Etherain annuler choix zone (écran)
-    icon: mdi:close
-    mode: single
-    sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.etherain_zone_selectionnee
-        data:
-          value: 0
-
-  etherain_arroser_zone_manuel:
-    alias: Etherain arroser zone (durée choisie)
-    icon: mdi:sprinkler
-    mode: single
-    sequence:
-      - variables:
-          zone: "{{ states('input_number.etherain_zone_selectionnee') | int(0) }}"
-          duree: "{{ states('input_number.etherain_duree_manuelle') | int(0) }}"
       - condition: template
-        value_template: "{{ 1 <= zone <= 5 and duree > 0 }}"
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.etherain_zone_selectionnee
-        data:
-          value: 0
+        value_template: "{{ 1 <= zone | int(0) <= 5 and duree | int(0) > 0 }}"
       # Un cycle en cours est arrêté proprement (ses automatisations envoient l'arrêt)
       - if:
           - condition: state
@@ -105,5 +53,56 @@ script:
       - action: rest_command.etherain_stop_irrigation
       - action: rest_command.etherain_irrigation_zone_manuel
         data:
+          zone: "{{ zone | int }}"
+          duree: "{{ duree | int }}"
+
+  etherain_arroser_bureau: &arroser
+    alias: Arroser Bureau
+    icon: mdi:briefcase
+    mode: single
+    fields:
+      duree:
+        name: Durée
+        required: true
+        default: 1
+        selector:
+          number:
+            min: 1
+            max: 60
+            mode: slider
+            unit_of_measurement: min
+    variables:
+      zone: 1
+    sequence:
+      - action: script.etherain_arroser_zone
+        data:
           zone: "{{ zone }}"
-          duree: "{{ duree }}"
+          duree: "{{ duree | default(1) }}"
+
+  etherain_arroser_salon:
+    <<: *arroser
+    alias: Arroser Salon
+    icon: mdi:sofa
+    variables:
+      zone: 2
+
+  etherain_arroser_cedre:
+    <<: *arroser
+    alias: Arroser Cèdre
+    icon: mdi:pine-tree
+    variables:
+      zone: 3
+
+  etherain_arroser_chambre:
+    <<: *arroser
+    alias: Arroser Chambre
+    icon: mdi:bed
+    variables:
+      zone: 4
+
+  etherain_arroser_gouttes:
+    <<: *arroser
+    alias: Arroser Gouttes
+    icon: mdi:water-opacity
+    variables:
+      zone: 5

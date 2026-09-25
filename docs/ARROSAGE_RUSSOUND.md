@@ -5,7 +5,7 @@ Depuis le 2026-09-25, Node-RED n'est plus nécessaire : l'arrosage Etherain et l
 ## Contenu du dépôt
 
 - `packages/remplacement_nodered.yaml` : capteurs `rest` de l'état Etherain et action `shell_command.russound_touche` ;
-- `packages/arrosage_manuel.yaml` : arrosage d'une zone pour une durée choisie depuis l'écran Arrosage ;
+- `packages/arrosage_manuel.yaml` : scripts d'arrosage d'une zone pour une durée choisie depuis l'écran Arrosage ;
 - `shell/russound_touche.py` : envoi des touches chiffre au Russound (à copier dans `/config/shell/`) ;
 - `tools/generate_arrosage_dashboard.py` : source de la vue `arrosage` du tableau de bord `lovelace-mobile` ;
 - `lovelace/arrosage_view.yaml` : vue générée.
@@ -32,7 +32,7 @@ Les commandes restent dans la configuration globale (`rest.yaml`, non versionné
 - bandeau d'état avec bouton Stop (confirmation) et barre d'avancement des 5 zones, toujours affichée ;
 - cycles Court, Moyen et Long avec leur durée totale ; la roue crantée ouvre les durées des cycles ;
 - zones dans l'ordre du cycle : Bureau, Salon, Cèdre, Chambre, Gouttes. Pendant un cycle, chaque zone est « Terminé », « En cours » ou « À venir » ;
-- un appui sur une zone ouvre un sélecteur de durée, initialisé à 1 min. « Arroser » arrête un éventuel cycle puis lance la zone.
+- un appui sur une zone ouvre la fenêtre native du script `script.etherain_arroser_<zone>` (« Arroser Cèdre »…) : durée de 1 à 60 min, 1 min par défaut, puis « Exécuter ». Le script commun `script.etherain_arroser_zone` arrête un éventuel cycle puis lance la zone.
 
 card-mod ne s'applique pas directement à une carte `grid` du tableau de bord : les grilles stylées sont enveloppées dans `custom:mod-card`.
 
