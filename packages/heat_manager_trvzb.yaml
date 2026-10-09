@@ -412,6 +412,20 @@ template:
             {% set s = expand('climate.radiateur_buanderie') | map(attribute='state') | unique | list %}
             {{ s[0] if s | count == 1 else 'mixte' }}
   - binary_sensor:
+      # PAC triphasée : quand elle tourne, les 3 phases montent ensemble ; les appareils
+      # monophasés n'en chargent qu'une. Phases 2 et 3 au repos ~250 VA, PAC en marche > 1 000 VA.
+      - name: Chauffage. PAC en fonctionnement
+        unique_id: chauffage_pac_en_fonctionnement
+        device_class: running
+        delay_on: "00:02:00"
+        delay_off: "00:03:00"
+        availability: >-
+          {{ has_value('sensor.compteur_linky_sinsts2') and has_value('sensor.compteur_linky_sinsts3') }}
+        state: >-
+          {{ [states('sensor.compteur_linky_sinsts2') | float(0), states('sensor.compteur_linky_sinsts3') | float(0)] | min > 600 }}
+        attributes:
+          usage: >-
+            {{ 'eau_chaude' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'chauffage' }}
       - name: Chauffage. Demande chauffage
         unique_id: chauffage_demande_chauffage
         icon: mdi:radiator

@@ -69,6 +69,8 @@ Le bloc `template` déclare dix capteurs de synthèse : maison, chambres inoccup
 
 Le capteur binaire de demande a pour `unique_id` `chauffage_demande_chauffage`. Son expression compte les vannes en `auto` ou `heat` dont la consigne dépasse la mesure de plus de 0,5 °C, avec un `delay_on` de quinze minutes. Ses attributs exposent les nombres de pièces en demande et en forte demande (écart supérieur à 1 °C), l’écart maximum, la pièce correspondante et la liste des pièces en demande. Le tableau de bord le référence comme `binary_sensor.chauffage_demande_chauffage` ; le registre réel d’entités n’a pas été consulté.
 
+Le capteur binaire `binary_sensor.chauffage_pac_en_fonctionnement` (`unique_id` `chauffage_pac_en_fonctionnement`, ajouté le 2026-10-09) indique si la PAC tourne réellement, d’après le compteur Linky : la PAC triphasée charge les trois phases ensemble, alors que les appareils monophasés n’en chargent qu’une. Il est vrai quand `sinsts2` et `sinsts3` dépassent toutes deux 600 VA (repos ~250 VA, PAC en marche > 1 000 VA), avec `delay_on` 2 min et `delay_off` 3 min. Son attribut `usage` vaut `eau_chaude` pendant `binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99`, sinon `chauffage`. Sur la page PAC, le bouton « Marche » est rouge quand la PAC chauffe la maison (capteur actif hors cycle d’eau chaude), gris quand elle est en marche au repos ; la carte « Eau chaude » est rouge pendant un cycle. Les cartes de zone comptent les vannes `hvac_action == heating`.
+
 ### Points d’entrée de commande
 
 | Script | Exécution | Entrées et services utilisés |

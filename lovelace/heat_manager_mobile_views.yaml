@@ -52,7 +52,7 @@ views:
                 hold_action:
                   action: "none"
                 card_mod:
-                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(194, 75, 0)' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--card-background-color)' }}; color: {{ 'white' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--secondary-text-color)' }}; }"
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ ('rgb(198, 40, 40)' if (is_state('binary_sensor.chauffage_pac_en_fonctionnement', 'on') and is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'off')) else 'rgb(140, 148, 156)') if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--card-background-color)' }}; color: {{ 'white' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if (is_state('climate.atlantic_alfea_m_duo_chauffage_circuit_1', 'heat') and not is_state('switch.atlantic_alfea_m_duo_absence', 'on')) else 'var(--secondary-text-color)' }}; --state-climate-heat-color: white; }"
               -
                 type: "button"
                 entity: "switch.atlantic_alfea_m_duo_absence"
@@ -206,7 +206,7 @@ views:
                   box-shadow: none;
                   min-height: 96px;
                   {% if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') %}
-                  background: rgb(194, 75, 0);
+                  background: rgb(198, 40, 40);
                   --primary-text-color: white;
                   --secondary-text-color: rgba(255, 255, 255, 0.85);
                   --card-primary-color: white;
@@ -347,7 +347,7 @@ views:
             secondary: |-
               {% set entities = ['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents'] %}
               {% set ns = namespace(total=0, temperatures=[]) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% for entity in entities %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if state_attr(entity, 'hvac_action') == 'heating' %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
               {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 3 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:bed-king-outline"
             icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
@@ -375,7 +375,7 @@ views:
             secondary: |-
               {% set entities = ['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie'] %}
               {% set ns = namespace(total=0, temperatures=[]) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% for entity in entities %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if state_attr(entity, 'hvac_action') == 'heating' %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
               {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 7 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:home-floor-1"
             icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
@@ -403,7 +403,7 @@ views:
             secondary: |-
               {% set entities = ['climate.radiateur_buanderie'] %}
               {% set ns = namespace(total=0, temperatures=[]) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% for entity in entities %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if state_attr(entity, 'hvac_action') == 'heating' %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
               {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 1 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:washing-machine"
             icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_buanderie']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"
@@ -431,7 +431,7 @@ views:
             secondary: |-
               {% set entities = ['climate.radiateur_atelier', 'climate.radiateur_salle_cine'] %}
               {% set ns = namespace(total=0, temperatures=[]) %}
-              {% for entity in entities %}{% set target = state_attr(entity, 'temperature') %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
+              {% for entity in entities %}{% set current = state_attr(entity, 'current_temperature') %}{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}{% if state_attr(entity, 'hvac_action') == 'heating' %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}
               {% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}{{ ns.total }} sur 2 en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}
             icon: "mdi:home-floor-negative-1"
             icon_color: "{{ 'deep-orange' if expand(['climate.radiateur_atelier', 'climate.radiateur_salle_cine']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count > 0 else 'disabled' }}"

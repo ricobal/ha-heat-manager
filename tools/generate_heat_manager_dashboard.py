@@ -29,6 +29,10 @@ ABSENCE_END = "datetime.atlantic_alfea_m_duo_fin_absence"
 ECS_AUTOMATION = "automation.gestion_eau_chaude_alfea_heures_creuses"
 
 ACTIVE_ORANGE = "rgb(194, 75, 0)"
+# Fonctionnement réel de la PAC (mesuré au compteur) : chauffe = rouge, en marche au repos = gris.
+PAC_RUNNING = "binary_sensor.chauffage_pac_en_fonctionnement"
+RUNNING_RED = "rgb(198, 40, 40)"
+IDLE_GREY = "rgb(140, 148, 156)"
 ACTIVE_BLUE = "rgb(21, 101, 192)"
 # Same page background as every lovelace-mobile view, so white cards stand out.
 VIEW_BACKGROUND = "#e4e9f0"
@@ -236,26 +240,21 @@ def _active_css(condition: str, background: str) -> str:
     )
 
 
-def half_width(card: dict[str, Any], active_condition: str | None = None) -> dict[str, Any]:
+def half_width(
+    card: dict[str, Any],
+    active_condition: str | None = None,
+    active_background: str = ACTIVE_ORANGE,
+) -> dict[str, Any]:
     """Make a Sections card occupy half the width (two cards side by side), taller than the default.
 
-    When `active_condition` (a Jinja expression) is given, the card gets the orange "Marche"
-    background of the heat pump view while the condition is true.
+    When `active_condition` (a Jinja expression) is given, the card gets a coloured
+    background while the condition is true.
     """
     result = dict(card)
     result["grid_options"] = HALF_WIDTH
     style = TALL_NAVIGATION_CARD_STYLE
     if active_condition:
-        active_css = (
-            "  {% if " + active_condition + " %}\n"
-            "  background: rgb(194, 75, 0);\n"
-            "  --primary-text-color: white;\n"
-            "  --secondary-text-color: rgba(255, 255, 255, 0.85);\n"
-            "  --card-primary-color: white;\n"
-            "  --card-secondary-color: rgba(255, 255, 255, 0.85);\n"
-            "  {% endif %}\n"
-        )
-        style = style.replace("  min-height: 96px;\n", "  min-height: 96px;\n" + active_css)
+        style = style.replace("  min-height: 96px;\n", "  min-height: 96px;\n" + _active_css(active_condition, active_background))
     result["card_mod"] = {"style": style}
     return result
 
@@ -330,10 +329,9 @@ def zone_card(zone: dict[str, Any]) -> dict[str, Any]:
         "{% set entities = " + entity_list + " %}\n"
         "{% set ns = namespace(total=0, temperatures=[]) %}\n"
         "{% for entity in entities %}"
-        "{% set target = state_attr(entity, 'temperature') %}"
         "{% set current = state_attr(entity, 'current_temperature') %}"
         "{% if current is number %}{% set ns.temperatures = ns.temperatures + [current] %}{% endif %}"
-        "{% if states(entity) in ['auto','heat'] and target is number and current is number and target-current > 0.5 %}"
+        "{% if state_attr(entity, 'hvac_action') == 'heating' %}"
         "{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}\n"
         "{% set moyenne = (ns.temperatures | sum / ns.temperatures | count) | round(1) if ns.temperatures | count else none %}"
         "{{ ns.total }} sur " + str(room_count) + " en demande · {{ moyenne ~ ' °C' if moyenne is not none else 'température indisponible' }}"
@@ -408,6 +406,13 @@ def pac_level1_buttons() -> dict[str, Any]:
         button["tap_action"] = perform("script.chauffage_pac_mode", {"mode": mode})
         condition = "is_state('" + PAC_CLIMATE + "', '" + mode + "')"
         button["card_mod"]["style"] = button["card_mod"]["style"].replace(condition, "(" + condition + " and not " + active + ")")
+    # Marche : rouge quand la PAC chauffe réellement la maison, gris quand elle attend
+    # (le chauffage de l'eau chaude est signalé par la carte Eau chaude).
+    heating = "(is_state('" + PAC_RUNNING + "', 'on') and is_state('" + ECS_CYCLE + "', 'off'))"
+    marche = grid["cards"][0]["card_mod"]
+    marche["style"] = marche["style"].replace("'rgb(194, 75, 0)'", "('" + RUNNING_RED + "' if " + heating + " else '" + IDLE_GREY + "')")
+    # L'icône suit sinon la couleur « chauffe » du thème (orange), seulement visible quand le bouton est actif.
+    marche["style"] = marche["style"].removesuffix("}") + "--state-climate-heat-color: white; }"
     absence["entity"] = ABSENCE_SWITCH
     absence["tap_action"] = perform("input_boolean.toggle")
     absence["tap_action"]["target"] = {"entity_id": ABSENCE_PANEL}
@@ -521,7 +526,7 @@ def global_view() -> dict[str, Any]:
             "badge_color": "{{ 'deep-orange' if is_state('" + ECS_CYCLE + "', 'on') else 'grey' }}",
             "tap_action": nav("chauffage-ecs"),
             "multiline_secondary": True,
-        }, active_condition="is_state('" + ECS_CYCLE + "', 'on')")
+        }, active_condition="is_state('" + ECS_CYCLE + "', 'on')", active_background=RUNNING_RED)
     temperatures, technical = pac_info_cards()
     cards: list[dict[str, Any]] = [
         full_width(title_card("PAC")),
