@@ -63,6 +63,14 @@ template:
           {{ (integration_entities('mqtt') + integration_entities('hue'))
              | select('is_state', 'unavailable') | map('device_id') | reject('none')
              | unique | list | count }}
+        attributes:
+          appareils: >-
+            {% set ns = namespace(l=[]) %}
+            {% for d in (integration_entities('mqtt') + integration_entities('hue'))
+                 | select('is_state', 'unavailable') | map('device_id') | reject('none') | unique %}
+              {% set ns.l = ns.l + [device_attr(d, 'name_by_user') or device_attr(d, 'name')] %}
+            {% endfor %}
+            {{ ns.l | sort }}
 
 automation:
   - id: monitoring_alerte_batteries_zigbee

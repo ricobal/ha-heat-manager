@@ -884,6 +884,26 @@ views:
               columns: 6
               rows: "auto"
           -
+            type: "conditional"
+            conditions:
+              -
+                condition: "numeric_state"
+                entity: "sensor.appareils_zigbee_indisponibles"
+                above: 0
+            card:
+              type: "custom:mushroom-template-card"
+              entity: "sensor.appareils_zigbee_indisponibles"
+              primary: "Appareils hors ligne"
+              secondary: "{{ (state_attr('sensor.appareils_zigbee_indisponibles', 'appareils') or []) | join('\\n') }}"
+              multiline_secondary: true
+              icon: "mdi:lan-disconnect"
+              icon_color: "orange"
+              tap_action:
+                action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "custom:mushroom-title-card"
             subtitle: "Coordinateurs"
           -
