@@ -31,6 +31,7 @@ ECS_AUTOMATION = "automation.gestion_eau_chaude_alfea_heures_creuses"
 ACTIVE_ORANGE = "rgb(194, 75, 0)"
 # Fonctionnement réel de la PAC (mesuré au compteur) : chauffe = rouge, en marche au repos = gris.
 PAC_RUNNING = "binary_sensor.chauffage_pac_en_fonctionnement"
+PAC_HEATING = "binary_sensor.chauffage_pac_en_chauffe"
 RUNNING_RED = "rgb(198, 40, 40)"
 IDLE_GREY = "rgb(140, 148, 156)"
 ACTIVE_BLUE = "rgb(21, 101, 192)"
@@ -611,6 +612,18 @@ def technical_view() -> dict[str, Any]:
             PAC_OUTDOOR,
             PAC_THERMOSTAT,
         ]},
+        {"type": "history-graph", "title": "Fonctionnement de la PAC", "hours_to_show": 48, "entities": [
+            {"entity": PAC_RUNNING, "name": "En marche (chauffage + ECS)"},
+            {"entity": PAC_HEATING, "name": "Chauffe maison"},
+            {"entity": ECS_CYCLE, "name": "Cycle eau chaude"},
+        ]},
+        *[
+            {"type": "glance", "title": title, "show_icon": False, "columns": 4, "entities": [
+                {"entity": f"sensor.chauffage_heures_pac_{key}_{period}", "name": label}
+                for period, label in (("jour", "Jour"), ("semaine", "Semaine"), ("mois", "Mois"), ("annee", "Année"))
+            ]}
+            for key, title in (("en_marche", "Heures en marche (chauffage + ECS)"), ("chauffe", "Heures de chauffe maison"))
+        ],
         {"type": "custom:mushroom-template-card", "primary": "Diagnostic et consommations", "secondary": "Connexion, Wi-Fi, compteurs et identification", "icon": "mdi:dots-horizontal-circle-outline", "tap_action": nav("chauffage-pac-diagnostic")},
     ]
     return make_view("État technique", "chauffage-pac-technique", cards, "chauffage-v2")

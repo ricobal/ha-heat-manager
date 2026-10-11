@@ -158,6 +158,64 @@ input_text:
     max: 255
     # Valeur de référence : "00:00/16 08:00/17 10:00/16 12:00/16 18:00/17 23:00/16"
 
+# Heures de fonctionnement de la PAC : compteur du jour (history_stats, remis à zéro à minuit),
+# cumulé par semaine / mois / année par utility_meter (indépendant de la durée de l'historique).
+sensor:
+  - platform: history_stats
+    name: Chauffage. Heures PAC en marche jour
+    unique_id: chauffage_heures_pac_en_marche_jour
+    entity_id: binary_sensor.chauffage_pac_en_fonctionnement
+    state: "on"
+    type: time
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+  - platform: history_stats
+    name: Chauffage. Heures PAC chauffe jour
+    unique_id: chauffage_heures_pac_chauffe_jour
+    entity_id: binary_sensor.chauffage_pac_en_chauffe
+    state: "on"
+    type: time
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+
+utility_meter:
+  chauffage_heures_pac_en_marche_semaine:
+    name: Chauffage. Heures PAC en marche semaine
+    unique_id: chauffage_heures_pac_en_marche_semaine
+    source: sensor.chauffage_heures_pac_en_marche_jour
+    cycle: weekly
+    periodically_resetting: true
+  chauffage_heures_pac_en_marche_mois:
+    name: Chauffage. Heures PAC en marche mois
+    unique_id: chauffage_heures_pac_en_marche_mois
+    source: sensor.chauffage_heures_pac_en_marche_jour
+    cycle: monthly
+    periodically_resetting: true
+  chauffage_heures_pac_en_marche_annee:
+    name: Chauffage. Heures PAC en marche année
+    unique_id: chauffage_heures_pac_en_marche_annee
+    source: sensor.chauffage_heures_pac_en_marche_jour
+    cycle: yearly
+    periodically_resetting: true
+  chauffage_heures_pac_chauffe_semaine:
+    name: Chauffage. Heures PAC chauffe semaine
+    unique_id: chauffage_heures_pac_chauffe_semaine
+    source: sensor.chauffage_heures_pac_chauffe_jour
+    cycle: weekly
+    periodically_resetting: true
+  chauffage_heures_pac_chauffe_mois:
+    name: Chauffage. Heures PAC chauffe mois
+    unique_id: chauffage_heures_pac_chauffe_mois
+    source: sensor.chauffage_heures_pac_chauffe_jour
+    cycle: monthly
+    periodically_resetting: true
+  chauffage_heures_pac_chauffe_annee:
+    name: Chauffage. Heures PAC chauffe année
+    unique_id: chauffage_heures_pac_chauffe_annee
+    source: sensor.chauffage_heures_pac_chauffe_jour
+    cycle: yearly
+    periodically_resetting: true
+
 template:
   - sensor:
       - name: Chauffage. Synthèse maison
@@ -426,6 +484,16 @@ template:
         attributes:
           usage: >-
             {{ 'eau_chaude' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'chauffage' }}
+      # PAC en marche pour la maison (hors cycle eau chaude) : sert à l'historique de chauffe.
+      - name: Chauffage. PAC en chauffe
+        unique_id: chauffage_pac_en_chauffe
+        icon: mdi:heat-wave
+        device_class: running
+        availability: >-
+          {{ has_value('binary_sensor.chauffage_pac_en_fonctionnement') }}
+        state: >-
+          {{ is_state('binary_sensor.chauffage_pac_en_fonctionnement', 'on')
+             and is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'off') }}
       - name: Chauffage. Demande chauffage
         unique_id: chauffage_demande_chauffage
         icon: mdi:radiator

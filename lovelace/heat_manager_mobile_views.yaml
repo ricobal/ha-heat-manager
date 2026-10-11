@@ -723,6 +723,65 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "history-graph"
+            title: "Fonctionnement de la PAC"
+            hours_to_show: 48
+            entities:
+              -
+                entity: "binary_sensor.chauffage_pac_en_fonctionnement"
+                name: "En marche (chauffage + ECS)"
+              -
+                entity: "binary_sensor.chauffage_pac_en_chauffe"
+                name: "Chauffe maison"
+              -
+                entity: "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
+                name: "Cycle eau chaude"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "glance"
+            title: "Heures en marche (chauffage + ECS)"
+            show_icon: false
+            columns: 4
+            entities:
+              -
+                entity: "sensor.chauffage_heures_pac_en_marche_jour"
+                name: "Jour"
+              -
+                entity: "sensor.chauffage_heures_pac_en_marche_semaine"
+                name: "Semaine"
+              -
+                entity: "sensor.chauffage_heures_pac_en_marche_mois"
+                name: "Mois"
+              -
+                entity: "sensor.chauffage_heures_pac_en_marche_annee"
+                name: "Année"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "glance"
+            title: "Heures de chauffe maison"
+            show_icon: false
+            columns: 4
+            entities:
+              -
+                entity: "sensor.chauffage_heures_pac_chauffe_jour"
+                name: "Jour"
+              -
+                entity: "sensor.chauffage_heures_pac_chauffe_semaine"
+                name: "Semaine"
+              -
+                entity: "sensor.chauffage_heures_pac_chauffe_mois"
+                name: "Mois"
+              -
+                entity: "sensor.chauffage_heures_pac_chauffe_annee"
+                name: "Année"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "custom:mushroom-template-card"
             primary: "Diagnostic et consommations"
             secondary: "Connexion, Wi-Fi, compteurs et identification"

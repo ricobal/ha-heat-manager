@@ -71,6 +71,8 @@ Le capteur binaire de demande a pour `unique_id` `chauffage_demande_chauffage`. 
 
 Le capteur binaire `binary_sensor.chauffage_pac_en_fonctionnement` (`unique_id` `chauffage_pac_en_fonctionnement`, ajouté le 2026-10-09) indique si la PAC tourne réellement, d’après le compteur Linky : la PAC triphasée charge les trois phases ensemble, alors que les appareils monophasés n’en chargent qu’une. Il est vrai quand `sinsts2` et `sinsts3` dépassent toutes deux 600 VA (repos ~250 VA, PAC en marche > 1 000 VA), avec `delay_on` 2 min et `delay_off` 3 min. Son attribut `usage` vaut `eau_chaude` pendant `binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99`, sinon `chauffage`. Sur la page PAC, le bouton « Marche » est rouge quand la PAC chauffe la maison (capteur actif hors cycle d’eau chaude), gris quand elle est en marche au repos ; la carte « Eau chaude » est rouge pendant un cycle. Les cartes de zone comptent les vannes `hvac_action == heating`.
 
+Heures de fonctionnement (ajouté le 2026-10-11) : `binary_sensor.chauffage_pac_en_chauffe` = PAC en marche hors cycle ECS. Deux `history_stats` du jour (`sensor.chauffage_heures_pac_en_marche_jour`, `sensor.chauffage_heures_pac_chauffe_jour`, remis à zéro à minuit) alimentent des `utility_meter` `periodically_resetting` par semaine / mois / année (`sensor.chauffage_heures_pac_{en_marche|chauffe}_{semaine|mois|annee}`), car le recorder ne garde que 7 jours. Page « État technique » : historique 48 h (en marche / chauffe maison / cycle ECS) et deux cartes `glance` Jour · Semaine · Mois · Année.
+
 ### Points d’entrée de commande
 
 | Script | Exécution | Entrées et services utilisés |
