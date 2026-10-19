@@ -919,6 +919,20 @@ script:
             data:
               hvac_mode: heat
               temperature: "{{ states(temperatures[mode_maison]) | float }}"
+      # Une TRVZB repassée en auto ne renvoie pas toujours la consigne de son planning
+      # (vu le 12/10 : chambre Julie et buanderie restées affichées à 13 °C). On la redemande.
+      - if:
+          - condition: template
+            value_template: "{{ mode_maison == 'Auto' }}"
+        then:
+          - delay: 10
+          - repeat:
+              for_each: "{{ toutes_vannes | select('is_state', 'auto') | list }}"
+              sequence:
+                - action: mqtt.publish
+                  data:
+                    topic: "zigbee2mqtt/{{ device_attr(repeat.item, 'name') }}/get"
+                    payload: '{"occupied_heating_setpoint": ""}'
 
 automation:
   - id: chauffage_mode_maison_sur_changement
