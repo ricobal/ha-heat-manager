@@ -558,7 +558,14 @@ def global_view() -> dict[str, Any]:
         "type": "custom:mushroom-template-card",
         "entity": demand,
         "primary": "Vannes thermostatiques · {{ states('input_select.chauffage_mode_maison') }}",
-        "secondary": "{{ state_attr('" + demand + "', 'nombre_pieces_en_demande') | int(0) }} pièces demandent du chauffage · écart max. {{ state_attr('" + demand + "', 'ecart_maximum') | float(0) }} °C",
+        # Deux mesures distinctes : vannes en chauffe (hvac_action, comme les cartes de zone)
+        # et pièces au-delà du seuil d'écart du binary_sensor de demande.
+        "secondary": (
+            "{% set v = expand(" + repr([room["entity"] for room in ROOMS.values()]).replace('"', "'") + ") | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count %}"
+            "{% set n = state_attr('" + demand + "', 'nombre_pieces_en_demande') | int(0) %}"
+            "{{ v }} vanne{{ 's' if v > 1 }} en chauffe · {{ n }} pièce{{ 's' if n > 1 }} à plus de "
+            "{{ state_attr('" + demand + "', 'seuil_ecart') }} °C de la consigne (max. {{ state_attr('" + demand + "', 'ecart_maximum') | float(0) }} °C)"
+        ),
         "icon": "mdi:radiator",
         "icon_color": "{{ 'deep-orange' if is_state('" + demand + "', 'on') else 'disabled' }}",
         "badge_icon": "{{ 'mdi:fire-alert' if state_attr('" + demand + "', 'nombre_pieces_forte_demande') | int(0) > 0 else 'mdi:chevron-right' }}",

@@ -456,7 +456,7 @@ views:
             type: "custom:mushroom-template-card"
             entity: "binary_sensor.chauffage_demande_chauffage"
             primary: "Vannes thermostatiques · {{ states('input_select.chauffage_mode_maison') }}"
-            secondary: "{{ state_attr('binary_sensor.chauffage_demande_chauffage', 'nombre_pieces_en_demande') | int(0) }} pièces demandent du chauffage · écart max. {{ state_attr('binary_sensor.chauffage_demande_chauffage', 'ecart_maximum') | float(0) }} °C"
+            secondary: "{% set v = expand(['climate.radiateur_parents', 'climate.radiateur_dressing', 'climate.radiateur_sdb_parents', 'climate.radiateur_chambre_julie', 'climate.radiateur_chambre_pablo', 'climate.radiateur_grande_chambre_amis', 'climate.radiateur_petite_chambre_amis', 'climate.radiateur_chambre_mathias', 'climate.radiateur_sdb_garcons', 'climate.radiateur_sdb_julie', 'climate.radiateur_buanderie', 'climate.radiateur_atelier', 'climate.radiateur_salle_cine']) | selectattr('attributes.hvac_action', 'eq', 'heating') | list | count %}{% set n = state_attr('binary_sensor.chauffage_demande_chauffage', 'nombre_pieces_en_demande') | int(0) %}{{ v }} vanne{{ 's' if v > 1 }} en chauffe · {{ n }} pièce{{ 's' if n > 1 }} à plus de {{ state_attr('binary_sensor.chauffage_demande_chauffage', 'seuil_ecart') }} °C de la consigne (max. {{ state_attr('binary_sensor.chauffage_demande_chauffage', 'ecart_maximum') | float(0) }} °C)"
             icon: "mdi:radiator"
             icon_color: "{{ 'deep-orange' if is_state('binary_sensor.chauffage_demande_chauffage', 'on') else 'disabled' }}"
             badge_icon: "{{ 'mdi:fire-alert' if state_attr('binary_sensor.chauffage_demande_chauffage', 'nombre_pieces_forte_demande') | int(0) > 0 else 'mdi:chevron-right' }}"
