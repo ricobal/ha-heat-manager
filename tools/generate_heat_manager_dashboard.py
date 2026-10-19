@@ -617,16 +617,32 @@ def technical_view() -> dict[str, Any]:
             {"entity": PAC_HEATING, "name": "Chauffe maison"},
             {"entity": ECS_CYCLE, "name": "Cycle eau chaude"},
         ]},
-        *[
-            {"type": "glance", "title": title, "show_icon": False, "columns": 4, "entities": [
-                {"entity": f"sensor.chauffage_heures_pac_{key}_{period}", "name": label}
-                for period, label in (("jour", "Jour"), ("semaine", "Semaine"), ("mois", "Mois"), ("annee", "Année"))
-            ]}
-            for key, title in (("en_marche", "Heures en marche (chauffage + ECS)"), ("chauffe", "Heures de chauffe maison"))
-        ],
+        {"type": "custom:mushroom-template-card", "primary": "Activité de la PAC", "secondary": "Heures de chauffe et d’eau chaude par jour, semaine, mois, année", "icon": "mdi:chart-bar", "tap_action": nav("chauffage-pac-activite")},
         {"type": "custom:mushroom-template-card", "primary": "Diagnostic et consommations", "secondary": "Connexion, Wi-Fi, compteurs et identification", "icon": "mdi:dots-horizontal-circle-outline", "tap_action": nav("chauffage-pac-diagnostic")},
     ]
     return make_view("État technique", "chauffage-pac-technique", cards, "chauffage-v2")
+
+
+def activity_view() -> dict[str, Any]:
+    # Les cumuls annuels (utility_meter total_increasing) alimentent les statistiques long terme ;
+    # la variation (change) donne les heures par heure, jour ou mois selon la période choisie.
+    heating, hot_water, running = (f"sensor.chauffage_heures_pac_{key}_annee" for key in ("chauffe", "eau_chaude", "en_marche"))
+    monthly = {"statistics": {"type": "change", "period": "month"}, "group_by": {"func": "sum", "duration": "1month"}}
+    cards = [
+        title_card("Activité de la PAC", "Heures de fonctionnement"),
+        {"type": "energy-date-selection", "collection_key": "energy_pac", "disable_compare": True},
+        {"type": "statistics-graph", "title": "Heures d’activité", "chart_type": "bar-stack", "stat_types": ["change"],
+         "energy_date_selection": True, "collection_key": "energy_pac", "hide_legend": True, "entities": [
+            {"entity": heating, "name": "Chauffe maison", "color": "#e53935"},
+            {"entity": hot_water, "name": "Eau chaude", "color": "#1e88e5"},
+        ]},
+        {"type": "markdown", "content": "<font color='#e53935'>■</font> Chauffe maison &nbsp; <font color='#1e88e5'>■</font> Eau chaude"},
+        {"type": "custom:apexcharts-card", "header": {"show": True, "title": "Cette année vs l’an dernier"}, "graph_span": "1y", "span": {"start": "year"}, "yaxis": [{"decimals": 0}], "series": [
+            {"entity": running, "name": "Cette année", "type": "column", "color": "#e53935", **monthly},
+            {"entity": running, "name": "L’an dernier", "type": "column", "color": "#9e9e9e", "offset": "-1y", **monthly},
+        ]},
+    ]
+    return make_view("Activité de la PAC", "chauffage-pac-activite", cards, "chauffage-pac-technique")
 
 
 def diagnostics_view() -> dict[str, Any]:
@@ -857,6 +873,7 @@ def build_views() -> list[dict[str, Any]]:
         ecs_schedule_view(),
         ecs_history_view(),
         technical_view(),
+        activity_view(),
         diagnostics_view(),
         settings_view(),
     ]

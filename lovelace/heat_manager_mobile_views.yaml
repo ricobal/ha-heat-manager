@@ -740,44 +740,13 @@ views:
               columns: "full"
               rows: "auto"
           -
-            type: "glance"
-            title: "Heures en marche (chauffage + ECS)"
-            show_icon: false
-            columns: 4
-            entities:
-              -
-                entity: "sensor.chauffage_heures_pac_en_marche_jour"
-                name: "Jour"
-              -
-                entity: "sensor.chauffage_heures_pac_en_marche_semaine"
-                name: "Semaine"
-              -
-                entity: "sensor.chauffage_heures_pac_en_marche_mois"
-                name: "Mois"
-              -
-                entity: "sensor.chauffage_heures_pac_en_marche_annee"
-                name: "Année"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "glance"
-            title: "Heures de chauffe maison"
-            show_icon: false
-            columns: 4
-            entities:
-              -
-                entity: "sensor.chauffage_heures_pac_chauffe_jour"
-                name: "Jour"
-              -
-                entity: "sensor.chauffage_heures_pac_chauffe_semaine"
-                name: "Semaine"
-              -
-                entity: "sensor.chauffage_heures_pac_chauffe_mois"
-                name: "Mois"
-              -
-                entity: "sensor.chauffage_heures_pac_chauffe_annee"
-                name: "Année"
+            type: "custom:mushroom-template-card"
+            primary: "Activité de la PAC"
+            secondary: "Heures de chauffe et d’eau chaude par jour, semaine, mois, année"
+            icon: "mdi:chart-bar"
+            tap_action:
+              action: "navigate"
+              navigation_path: "/lovelace-mobile/chauffage-pac-activite"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -789,6 +758,110 @@ views:
             tap_action:
               action: "navigate"
               navigation_path: "/lovelace-mobile/chauffage-pac-diagnostic"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+    background: "#e4e9f0"
+    visible: false
+  -
+    title: "Activité de la PAC"
+    path: "chauffage-pac-activite"
+    type: "sections"
+    max_columns: 1
+    sections:
+      -
+        type: "grid"
+        cards:
+          -
+            type: "custom:mushroom-chips-card"
+            chips:
+              -
+                type: "back"
+              -
+                type: "action"
+                tap_action:
+                  action: "navigate"
+                  navigation_path: "/lovelace-mobile/0"
+                icon: "mdi:home"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: "Activité de la PAC"
+            subtitle: "Heures de fonctionnement"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "energy-date-selection"
+            collection_key: "energy_pac"
+            disable_compare: true
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "statistics-graph"
+            title: "Heures d’activité"
+            chart_type: "bar-stack"
+            stat_types:
+              - "change"
+            energy_date_selection: true
+            collection_key: "energy_pac"
+            hide_legend: true
+            entities:
+              -
+                entity: "sensor.chauffage_heures_pac_chauffe_annee"
+                name: "Chauffe maison"
+                color: "#e53935"
+              -
+                entity: "sensor.chauffage_heures_pac_eau_chaude_annee"
+                name: "Eau chaude"
+                color: "#1e88e5"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "markdown"
+            content: "<font color='#e53935'>■</font> Chauffe maison &nbsp; <font color='#1e88e5'>■</font> Eau chaude"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:apexcharts-card"
+            header:
+              show: true
+              title: "Cette année vs l’an dernier"
+            graph_span: "1y"
+            span:
+              start: "year"
+            yaxis:
+              -
+                decimals: 0
+            series:
+              -
+                entity: "sensor.chauffage_heures_pac_en_marche_annee"
+                name: "Cette année"
+                type: "column"
+                color: "#e53935"
+                statistics:
+                  type: "change"
+                  period: "month"
+                group_by:
+                  func: "sum"
+                  duration: "1month"
+              -
+                entity: "sensor.chauffage_heures_pac_en_marche_annee"
+                name: "L’an dernier"
+                type: "column"
+                color: "#9e9e9e"
+                offset: "-1y"
+                statistics:
+                  type: "change"
+                  period: "month"
+                group_by:
+                  func: "sum"
+                  duration: "1month"
             grid_options:
               columns: "full"
               rows: "auto"
