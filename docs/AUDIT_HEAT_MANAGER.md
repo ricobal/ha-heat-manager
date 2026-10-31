@@ -42,7 +42,7 @@ La reprise après lecture de `AGENTS.md` complète le contexte d’installation 
 | Générateur ↔ YAML versionné | Source Python et sortie distinctes ; régénération et équivalence non vérifiées |
 | Interface ↔ package | Références des cartes, helpers affichés et scripts effectivement utilisés ; auxiliaire `mode_chips()` hors construction actuelle |
 | Identifiants historiques ↔ registre HA | `sdb_garcons` associé au planning `sdb_mathias` et `unique_id` historique de synthèse |
-| ECS ↔ installation | Import optionnel et identifiant d’automatisation attendu par `ECS_AUTOMATION` |
+| ECS ↔ installation | Import optionnel ; l’automatisation lit `input_select.eau_chaude_mode` (package) et doit rester active (plus de dépendance du tableau de bord à son identifiant depuis le 2026-10-31) |
 | Dépôt ↔ configuration déployée | Copies homonymes dans le répertoire parent ; synchronisation et activation non établies |
 
 Cette liste conserve les points de jonction de l’architecture pour une éventuelle phase suivante. Elle ne constitue pas un audit de ces interfaces et ne propose aucune correction.

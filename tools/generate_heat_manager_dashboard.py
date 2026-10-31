@@ -20,13 +20,12 @@ PAC_SETPOINT = "number.atlantic_alfea_m_duo_temperature_de_consigne"
 PAC_THERMOSTAT = "sensor.atlantic_alfea_m_duo_temperature_thermostat_z1"
 PAC_OUTDOOR = "sensor.atlantic_alfea_m_duo_temperature_exterieure"
 ECS_SWITCH = "switch.atlantic_alfea_m_duo_eau_chaude"
-ECS_BOOST = "switch.atlantic_alfea_m_duo_boost_ecs"
 ECS_CYCLE = "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
 ECS_TEMPERATURE = "sensor.atlantic_alfea_m_duo_temperature_ecs"
 ABSENCE_SWITCH = "switch.atlantic_alfea_m_duo_absence"
 ABSENCE_START = "datetime.atlantic_alfea_m_duo_debut_absence"
 ABSENCE_END = "datetime.atlantic_alfea_m_duo_fin_absence"
-ECS_AUTOMATION = "automation.gestion_eau_chaude_alfea_heures_creuses"
+ECS_MODE = "input_select.eau_chaude_mode"
 
 ACTIVE_ORANGE = "rgb(194, 75, 0)"
 # Fonctionnement réel de la PAC (mesuré au compteur) : chauffe = rouge, en marche au repos = gris.
@@ -520,7 +519,7 @@ def global_view() -> dict[str, Any]:
             "type": "custom:mushroom-template-card",
             "entity": ECS_TEMPERATURE,
             "primary": "Eau chaude",
-            "secondary": "{{ states('" + ECS_TEMPERATURE + "') }} °C · {{ 'autorisée' if is_state('" + ECS_SWITCH + "', 'on') else 'désactivée' }} · cycle {{ 'actif' if is_state('" + ECS_CYCLE + "', 'on') else 'inactif' }}",
+            "secondary": "{{ states('" + ECS_TEMPERATURE + "') }} °C · {{ states('" + ECS_MODE + "') }}",
             "icon": "mdi:water-boiler",
             "icon_color": "{{ '#ff6f22' if is_state('" + ECS_CYCLE + "', 'on') else 'cyan' }}",
             "badge_icon": "{{ 'mdi:fire' if is_state('" + ECS_CYCLE + "', 'on') else 'mdi:clock-outline' }}",
@@ -579,25 +578,19 @@ def global_view() -> dict[str, Any]:
 def ecs_view() -> dict[str, Any]:
     cards = [
         title_card("Eau chaude", "Commandes et état du ballon"),
-        {"type": "custom:mushroom-entity-card", "entity": ECS_SWITCH, "name": "Eau chaude autorisée", "icon": "mdi:water-boiler", "tap_action": {"action": "toggle"}},
-        {"type": "custom:mushroom-entity-card", "entity": ECS_BOOST, "name": "Boost ECS", "icon": "mdi:fire", "tap_action": {"action": "toggle"}},
+        {"type": "custom:mushroom-title-card", "subtitle": "Mode : {{ states('" + ECS_MODE + "') }}"},
+        hvac_mode_buttons(ECS_MODE, (
+            ("En continu", "En continu", "mdi:all-inclusive", "194, 75, 0"),
+            ("Heures creuses", "Heures creuses", "mdi:clock-time-four-outline", "21, 101, 192"),
+        ), ("input_select.select_option", "option")),
         {"type": "horizontal-stack", "cards": [
             {"type": "custom:mushroom-template-card", "entity": ECS_TEMPERATURE, "primary": "{{ states('" + ECS_TEMPERATURE + "') }} °C", "secondary": "Température ECS", "icon": "mdi:thermometer-water"},
             {"type": "custom:mushroom-template-card", "entity": ECS_CYCLE, "primary": "{{ 'Actif' if is_state('" + ECS_CYCLE + "', 'on') else 'Inactif' }}", "secondary": "Cycle ECS", "icon": "mdi:progress-clock", "icon_color": "{{ 'deep-orange' if is_state('" + ECS_CYCLE + "', 'on') else 'disabled' }}"},
         ]},
-        {"type": "custom:mushroom-template-card", "primary": "Plages heures creuses", "secondary": "00:54–07:24 · 11:54–13:24", "icon": "mdi:calendar-clock", "tap_action": nav("chauffage-ecs-planning")},
+        {"type": "custom:mushroom-template-card", "primary": "Plages heures creuses", "secondary": "{{ 'Inactives en mode continu' if is_state('" + ECS_MODE + "', 'En continu') else '00:54–07:24 · 11:54–13:24' }} · ECS {{ 'autorisée' if is_state('" + ECS_SWITCH + "', 'on') else 'coupée' }}", "icon": "mdi:calendar-clock"},
         {"type": "custom:mushroom-template-card", "primary": "Historique ECS", "secondary": "Autorisation et température sur trois jours", "icon": "mdi:chart-line", "tap_action": nav("chauffage-ecs-historique")},
     ]
     return make_view("Eau chaude", "chauffage-ecs", cards, "chauffage-v2")
-
-
-def ecs_schedule_view() -> dict[str, Any]:
-    cards = [
-        title_card("Planning eau chaude", "Automatisation des heures creuses"),
-        {"type": "entities", "show_header_toggle": False, "entities": [{"entity": ECS_AUTOMATION, "name": "Gestion ECS automatique"}]},
-        {"type": "markdown", "content": "**Nuit :** 00:54 → 07:24  \n**Midi :** 11:54 → 13:24  \nSi un cycle est actif à la fin d’une plage, l’automatisation attend sa fin pendant 90 minutes au maximum avant de couper l’autorisation ECS."},
-    ]
-    return make_view("Planning eau chaude", "chauffage-ecs-planning", cards, "chauffage-ecs")
 
 
 def ecs_history_view() -> dict[str, Any]:
@@ -877,7 +870,6 @@ def build_views() -> list[dict[str, Any]]:
     views: list[dict[str, Any]] = [
         global_view(),
         ecs_view(),
-        ecs_schedule_view(),
         ecs_history_view(),
         technical_view(),
         activity_view(),

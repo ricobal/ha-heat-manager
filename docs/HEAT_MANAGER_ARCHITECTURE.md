@@ -123,7 +123,7 @@ Les 36 vues déclarées se répartissent en sept vues générales, trois vues de
 |---|---|
 | Accueil et paramètres | `chauffage-v2`, `chauffage-parametres` |
 | PAC | `chauffage-pac-technique`, `chauffage-pac-diagnostic` (commandes, consigne et absence sur `chauffage-v2`) |
-| ECS | `chauffage-ecs`, `chauffage-ecs-planning`, `chauffage-ecs-historique` |
+| ECS | `chauffage-ecs`, `chauffage-ecs-historique` |
 | Zones | `chauffage-zone-parents`, `chauffage-zone-premier-etage`, `chauffage-zone-sous-sol` |
 | Pièces et planning | `chauffage-piece-<clé avec tirets>`, `chauffage-planning-piece-<clé avec tirets>` |
 
@@ -139,7 +139,9 @@ Depuis le 2026-09-22, les pages `chauffage-pac` et `chauffage-absence` sont supp
 
 L’exemple déclare quatre horaires (00:54, 07:24, 11:54, 13:24) et un déclencheur au démarrage de Home Assistant. Il active l’autorisation ECS au début des plages, ou au démarrage si une plage est en cours. Dans la branche de désactivation, il attend la fin du cycle actif, au maximum 90 minutes, puis coupe le switch. Son mode est `restart`.
 
-Ses dépendances sont `switch.atlantic_alfea_m_duo_eau_chaude` et `binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99`. Le tableau de bord attend l’entité `automation.gestion_eau_chaude_alfea_heures_creuses`, définie par la constante `ECS_AUTOMATION`. L’existence de cet identifiant après import n’est pas établie ici.
+Depuis le 2026-10-31, `input_select.eau_chaude_mode` (package, options « En continu » / « Heures creuses », état restauré au démarrage) choisit le fonctionnement. En « En continu », l’automatisation autorise l’ECS et s’arrête à chaque déclenchement. Un changement de mode la déclenche (id `changement_mode`), traité comme le démarrage de Home Assistant. L’automatisation doit donc rester active en permanence : l’écran Eau chaude n’a plus d’interrupteur d’automatisation (page `chauffage-ecs-planning` supprimée), seulement deux boutons jointifs pour le mode. Le bouton Boost ECS est retiré : il ne fait que démarrer un cycle, à la même puissance qu’un cycle normal (mesure Linky du 24/10).
+
+Ses dépendances sont `switch.atlantic_alfea_m_duo_eau_chaude`, `binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99` et `input_select.eau_chaude_mode`.
 
 ## 7. Frontière de déploiement
 

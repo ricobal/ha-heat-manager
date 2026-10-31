@@ -75,13 +75,7 @@ L’exemple `examples/ecs_hours_offpeak_automation.yaml` autorise l’ECS pendan
 
 Si un cycle est encore actif à la fin d’une plage, il attend son arrêt pendant 90 minutes au maximum avant de couper l’autorisation ECS.
 
-L’automatisation est volontairement séparée du package. Si une automatisation équivalente existe déjà, conservez-en une seule. Le tableau de bord s’attend à l’identifiant :
-
-```text
-automation.gestion_eau_chaude_alfea_heures_creuses
-```
-
-Adaptez la constante `ECS_AUTOMATION` du générateur si Home Assistant lui a attribué un autre identifiant.
+L’automatisation est volontairement séparée du package. Si une automatisation équivalente existe déjà, conservez-en une seule. Elle lit `input_select.eau_chaude_mode` (défini dans le package) : en « En continu », l’ECS reste autorisée en permanence. Elle doit rester active ; le mode se change depuis l’écran Eau chaude.
 
 ## Planning global de la PAC
 

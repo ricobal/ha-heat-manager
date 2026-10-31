@@ -186,7 +186,7 @@ views:
             type: "custom:mushroom-template-card"
             entity: "sensor.atlantic_alfea_m_duo_temperature_ecs"
             primary: "Eau chaude"
-            secondary: "{{ states('sensor.atlantic_alfea_m_duo_temperature_ecs') }} °C · {{ 'autorisée' if is_state('switch.atlantic_alfea_m_duo_eau_chaude', 'on') else 'désactivée' }} · cycle {{ 'actif' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'inactif' }}"
+            secondary: "{{ states('sensor.atlantic_alfea_m_duo_temperature_ecs') }} °C · {{ states('input_select.eau_chaude_mode') }}"
             icon: "mdi:water-boiler"
             icon_color: "{{ '#ff6f22' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'cyan' }}"
             badge_icon: "{{ 'mdi:fire' if is_state('binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99', 'on') else 'mdi:clock-outline' }}"
@@ -512,22 +512,54 @@ views:
               columns: "full"
               rows: "auto"
           -
-            type: "custom:mushroom-entity-card"
-            entity: "switch.atlantic_alfea_m_duo_eau_chaude"
-            name: "Eau chaude autorisée"
-            icon: "mdi:water-boiler"
-            tap_action:
-              action: "toggle"
+            type: "custom:mushroom-title-card"
+            subtitle: "Mode : {{ states('input_select.eau_chaude_mode') }}"
             grid_options:
               columns: "full"
               rows: "auto"
           -
-            type: "custom:mushroom-entity-card"
-            entity: "switch.atlantic_alfea_m_duo_boost_ecs"
-            name: "Boost ECS"
-            icon: "mdi:fire"
-            tap_action:
-              action: "toggle"
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_select.eau_chaude_mode"
+                name: "En continu"
+                icon: "mdi:all-inclusive"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_select.select_option"
+                  data:
+                    option: "En continu"
+                  target:
+                    entity_id: "input_select.eau_chaude_mode"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(194, 75, 0)' if is_state('input_select.eau_chaude_mode', 'En continu') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_select.eau_chaude_mode', 'En continu') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_select.eau_chaude_mode', 'En continu') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_select.eau_chaude_mode', 'En continu') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_select.eau_chaude_mode"
+                name: "Heures creuses"
+                icon: "mdi:clock-time-four-outline"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_select.select_option"
+                  data:
+                    option: "Heures creuses"
+                  target:
+                    entity_id: "input_select.eau_chaude_mode"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(21, 101, 192)' if is_state('input_select.eau_chaude_mode', 'Heures creuses') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_select.eau_chaude_mode', 'Heures creuses') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_select.eau_chaude_mode', 'Heures creuses') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_select.eau_chaude_mode', 'Heures creuses') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -553,11 +585,8 @@ views:
           -
             type: "custom:mushroom-template-card"
             primary: "Plages heures creuses"
-            secondary: "00:54–07:24 · 11:54–13:24"
+            secondary: "{{ 'Inactives en mode continu' if is_state('input_select.eau_chaude_mode', 'En continu') else '00:54–07:24 · 11:54–13:24' }} · ECS {{ 'autorisée' if is_state('switch.atlantic_alfea_m_duo_eau_chaude', 'on') else 'coupée' }}"
             icon: "mdi:calendar-clock"
-            tap_action:
-              action: "navigate"
-              navigation_path: "/lovelace-mobile/chauffage-ecs-planning"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -569,57 +598,6 @@ views:
             tap_action:
               action: "navigate"
               navigation_path: "/lovelace-mobile/chauffage-ecs-historique"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-    background: "#e4e9f0"
-    visible: false
-  -
-    title: "Planning eau chaude"
-    path: "chauffage-ecs-planning"
-    type: "sections"
-    max_columns: 1
-    sections:
-      -
-        type: "grid"
-        cards:
-          -
-            type: "custom:mushroom-chips-card"
-            chips:
-              -
-                type: "back"
-              -
-                type: "action"
-                tap_action:
-                  action: "navigate"
-                  navigation_path: "/lovelace-mobile/0"
-                icon: "mdi:home"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "custom:mushroom-title-card"
-            title: "Planning eau chaude"
-            subtitle: "Automatisation des heures creuses"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "entities"
-            show_header_toggle: false
-            entities:
-              -
-                entity: "automation.gestion_eau_chaude_alfea_heures_creuses"
-                name: "Gestion ECS automatique"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "markdown"
-            content: |-
-              **Nuit :** 00:54 → 07:24  
-              **Midi :** 11:54 → 13:24  
-              Si un cycle est actif à la fin d’une plage, l’automatisation attend sa fin pendant 90 minutes au maximum avant de couper l’autorisation ECS.
             grid_options:
               columns: "full"
               rows: "auto"

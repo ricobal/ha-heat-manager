@@ -38,6 +38,13 @@ input_select:
       - Arrêt
     # Valeur de référence (état restauré au démarrage) : Auto
     icon: mdi:home-thermometer-outline
+  eau_chaude_mode:
+    name: Mode eau chaude
+    options:
+      - En continu
+      - Heures creuses
+    # Lu par l'automatisation « Gestion eau chaude Alfea heures creuses » (état restauré au démarrage)
+    icon: mdi:water-boiler
 
 input_text:
   chauffage_mode_avant_absence:
