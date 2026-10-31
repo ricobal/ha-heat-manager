@@ -122,7 +122,7 @@ Les 36 vues déclarées se répartissent en sept vues générales, trois vues de
 | Groupe | Routes sous `/lovelace-mobile/` |
 |---|---|
 | Accueil et paramètres | `chauffage-v2`, `chauffage-parametres` |
-| PAC | `chauffage-pac-technique`, `chauffage-pac-diagnostic` (commandes, consigne et absence sur `chauffage-v2`) |
+| PAC | `chauffage-pac-technique` (carte Activité du jour en tête, puis mesures et indicateurs de diagnostic ; page `chauffage-pac-diagnostic` fusionnée le 2026-10-31), `chauffage-pac-activite` (commandes, consigne et absence sur `chauffage-v2`) |
 | ECS | `chauffage-ecs`, `chauffage-ecs-historique` |
 | Zones | `chauffage-zone-parents`, `chauffage-zone-premier-etage`, `chauffage-zone-sous-sol` |
 | Pièces et planning | `chauffage-piece-<clé avec tirets>`, `chauffage-planning-piece-<clé avec tirets>` |

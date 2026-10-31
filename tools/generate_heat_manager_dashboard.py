@@ -30,7 +30,6 @@ ECS_MODE = "input_select.eau_chaude_mode"
 ACTIVE_ORANGE = "rgb(194, 75, 0)"
 # Fonctionnement réel de la PAC (mesuré au compteur) : chauffe = rouge, en marche au repos = gris.
 PAC_RUNNING = "binary_sensor.chauffage_pac_en_fonctionnement"
-PAC_HEATING = "binary_sensor.chauffage_pac_en_chauffe"
 RUNNING_RED = "rgb(198, 40, 40)"
 IDLE_GREY = "rgb(140, 148, 156)"
 ACTIVE_BLUE = "rgb(21, 101, 192)"
@@ -602,23 +601,30 @@ def ecs_history_view() -> dict[str, Any]:
     return make_view("Historique ECS", "chauffage-ecs-historique", cards, "chauffage-ecs")
 
 
+def hours_minutes(entity: str) -> str:
+    """Durée en heures décimales (history_stats) affichée en « 5 h 43 »."""
+    return "{% set m = (states('" + entity + "') | float(0) * 60) | round | int %}{{ m // 60 }} h {{ '%02d' % (m % 60) }}"
+
+
 def technical_view() -> dict[str, Any]:
     cards = [
         title_card("État technique", "Mesures principales de la pompe à chaleur"),
+        {"type": "custom:mushroom-template-card", "primary": "Activité de la PAC",
+         "secondary": "{{ now().strftime('%d/%m') }} · chauffage " + hours_minutes("sensor.chauffage_heures_pac_chauffe_jour")
+         + " · ECS " + hours_minutes("sensor.chauffage_heures_pac_eau_chaude_jour"),
+         "icon": "mdi:chart-bar", "tap_action": nav("chauffage-pac-activite")},
         {"type": "entities", "show_header_toggle": False, "entities": [
             "sensor.atlantic_alfea_m_duo_pression_deau",
             "sensor.atlantic_alfea_m_duo_temperature_chaudiere",
             "sensor.atlantic_alfea_m_duo_temperature_echappement",
-            PAC_OUTDOOR,
-            PAC_THERMOSTAT,
+            "binary_sensor.atlantic_alfea_m_duo_connexion_cozytouch",
+            "sensor.atlantic_alfea_m_duo_signal_wi_fi",
+            "sensor.atlantic_alfea_m_duo_zone_1",
+            ECS_CYCLE,
+            "sensor.atlantic_alfea_m_duo_consommation_1",
+            "sensor.atlantic_alfea_m_duo_consommation_2",
+            "sensor.atlantic_alfea_m_duo_modele",
         ]},
-        {"type": "history-graph", "title": "Fonctionnement de la PAC", "hours_to_show": 48, "entities": [
-            {"entity": PAC_RUNNING, "name": "En marche (chauffage + ECS)"},
-            {"entity": PAC_HEATING, "name": "Chauffe maison"},
-            {"entity": ECS_CYCLE, "name": "Cycle eau chaude"},
-        ]},
-        {"type": "custom:mushroom-template-card", "primary": "Activité de la PAC", "secondary": "Heures de chauffe et d’eau chaude par jour, semaine, mois, année", "icon": "mdi:chart-bar", "tap_action": nav("chauffage-pac-activite")},
-        {"type": "custom:mushroom-template-card", "primary": "Diagnostic et consommations", "secondary": "Connexion, Wi-Fi, compteurs et identification", "icon": "mdi:dots-horizontal-circle-outline", "tap_action": nav("chauffage-pac-diagnostic")},
     ]
     return make_view("État technique", "chauffage-pac-technique", cards, "chauffage-v2")
 
@@ -645,22 +651,6 @@ def activity_view() -> dict[str, Any]:
     return make_view("Activité de la PAC", "chauffage-pac-activite", cards, "chauffage-pac-technique")
 
 
-def diagnostics_view() -> dict[str, Any]:
-    cards = [
-        title_card("Diagnostic PAC"),
-        {"type": "entities", "show_header_toggle": False, "entities": [
-            "binary_sensor.atlantic_alfea_m_duo_connexion_cozytouch",
-            "sensor.atlantic_alfea_m_duo_signal_wi_fi",
-            "sensor.atlantic_alfea_m_duo_zone_1",
-            ECS_CYCLE,
-            "binary_sensor.atlantic_alfea_m_duo_mode_boost",
-            "sensor.atlantic_alfea_m_duo_consommation_1",
-            "sensor.atlantic_alfea_m_duo_consommation_2",
-            "sensor.atlantic_alfea_m_duo_modele",
-            "sensor.atlantic_alfea_m_duo_fuseau_horaire",
-        ]},
-    ]
-    return make_view("Diagnostic PAC", "chauffage-pac-diagnostic", cards, "chauffage-pac-technique")
 
 
 def zone_view(zone: dict[str, Any]) -> dict[str, Any]:
@@ -873,7 +863,6 @@ def build_views() -> list[dict[str, Any]]:
         ecs_history_view(),
         technical_view(),
         activity_view(),
-        diagnostics_view(),
         settings_view(),
     ]
     for zone in ZONES:

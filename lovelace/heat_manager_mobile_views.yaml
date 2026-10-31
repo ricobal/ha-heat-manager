@@ -689,38 +689,9 @@ views:
               columns: "full"
               rows: "auto"
           -
-            type: "entities"
-            show_header_toggle: false
-            entities:
-              - "sensor.atlantic_alfea_m_duo_pression_deau"
-              - "sensor.atlantic_alfea_m_duo_temperature_chaudiere"
-              - "sensor.atlantic_alfea_m_duo_temperature_echappement"
-              - "sensor.atlantic_alfea_m_duo_temperature_exterieure"
-              - "sensor.atlantic_alfea_m_duo_temperature_thermostat_z1"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "history-graph"
-            title: "Fonctionnement de la PAC"
-            hours_to_show: 48
-            entities:
-              -
-                entity: "binary_sensor.chauffage_pac_en_fonctionnement"
-                name: "En marche (chauffage + ECS)"
-              -
-                entity: "binary_sensor.chauffage_pac_en_chauffe"
-                name: "Chauffe maison"
-              -
-                entity: "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
-                name: "Cycle eau chaude"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
             type: "custom:mushroom-template-card"
             primary: "Activité de la PAC"
-            secondary: "Heures de chauffe et d’eau chaude par jour, semaine, mois, année"
+            secondary: "{{ now().strftime('%d/%m') }} · chauffage {% set m = (states('sensor.chauffage_heures_pac_chauffe_jour') | float(0) * 60) | round | int %}{{ m // 60 }} h {{ '%02d' % (m % 60) }} · ECS {% set m = (states('sensor.chauffage_heures_pac_eau_chaude_jour') | float(0) * 60) | round | int %}{{ m // 60 }} h {{ '%02d' % (m % 60) }}"
             icon: "mdi:chart-bar"
             tap_action:
               action: "navigate"
@@ -729,13 +700,19 @@ views:
               columns: "full"
               rows: "auto"
           -
-            type: "custom:mushroom-template-card"
-            primary: "Diagnostic et consommations"
-            secondary: "Connexion, Wi-Fi, compteurs et identification"
-            icon: "mdi:dots-horizontal-circle-outline"
-            tap_action:
-              action: "navigate"
-              navigation_path: "/lovelace-mobile/chauffage-pac-diagnostic"
+            type: "entities"
+            show_header_toggle: false
+            entities:
+              - "sensor.atlantic_alfea_m_duo_pression_deau"
+              - "sensor.atlantic_alfea_m_duo_temperature_chaudiere"
+              - "sensor.atlantic_alfea_m_duo_temperature_echappement"
+              - "binary_sensor.atlantic_alfea_m_duo_connexion_cozytouch"
+              - "sensor.atlantic_alfea_m_duo_signal_wi_fi"
+              - "sensor.atlantic_alfea_m_duo_zone_1"
+              - "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
+              - "sensor.atlantic_alfea_m_duo_consommation_1"
+              - "sensor.atlantic_alfea_m_duo_consommation_2"
+              - "sensor.atlantic_alfea_m_duo_modele"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -840,53 +817,6 @@ views:
                 group_by:
                   func: "sum"
                   duration: "1month"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-    background: "#e4e9f0"
-    visible: false
-  -
-    title: "Diagnostic PAC"
-    path: "chauffage-pac-diagnostic"
-    type: "sections"
-    max_columns: 1
-    sections:
-      -
-        type: "grid"
-        cards:
-          -
-            type: "custom:mushroom-chips-card"
-            chips:
-              -
-                type: "back"
-              -
-                type: "action"
-                tap_action:
-                  action: "navigate"
-                  navigation_path: "/lovelace-mobile/0"
-                icon: "mdi:home"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "custom:mushroom-title-card"
-            title: "Diagnostic PAC"
-            grid_options:
-              columns: "full"
-              rows: "auto"
-          -
-            type: "entities"
-            show_header_toggle: false
-            entities:
-              - "binary_sensor.atlantic_alfea_m_duo_connexion_cozytouch"
-              - "sensor.atlantic_alfea_m_duo_signal_wi_fi"
-              - "sensor.atlantic_alfea_m_duo_zone_1"
-              - "binary_sensor.atlantic_alfea_m_duo_cycle_ecs_capacite_99"
-              - "binary_sensor.atlantic_alfea_m_duo_mode_boost"
-              - "sensor.atlantic_alfea_m_duo_consommation_1"
-              - "sensor.atlantic_alfea_m_duo_consommation_2"
-              - "sensor.atlantic_alfea_m_duo_modele"
-              - "sensor.atlantic_alfea_m_duo_fuseau_horaire"
             grid_options:
               columns: "full"
               rows: "auto"
