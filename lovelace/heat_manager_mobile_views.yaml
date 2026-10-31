@@ -927,7 +927,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_parents', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_parents', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_parents'), states('climate.radiateur_parents')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_parents'), states('climate.radiateur_parents')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'Absent' }}
             icon: "mdi:bed-king-outline"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_parents', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_parents') in ['unknown', 'unavailable'] else '' }}"
@@ -1019,7 +1019,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_chambre_julie', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_chambre_julie', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_julie'), states('climate.radiateur_chambre_julie')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_julie'), states('climate.radiateur_chambre_julie')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'Absent' }}
             icon: "mdi:bed-outline"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_julie', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_chambre_julie') in ['unknown', 'unavailable'] else '' }}"
@@ -1037,7 +1037,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_chambre_pablo', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_chambre_pablo', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_pablo'), states('climate.radiateur_chambre_pablo')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_pablo'), states('climate.radiateur_chambre_pablo')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'Absent' }}
             icon: "mdi:bed-outline"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_pablo', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_chambre_pablo') in ['unknown', 'unavailable'] else '' }}"
@@ -1055,7 +1055,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_grande_chambre_amis', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_grande_chambre_amis', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_grande_chambre_amis'), states('climate.radiateur_grande_chambre_amis')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_grande_chambre_amis'), states('climate.radiateur_grande_chambre_amis')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'Absent' }}
             icon: "mdi:bed-empty"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_grande_chambre_amis', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_grande_chambre_amis') in ['unknown', 'unavailable'] else '' }}"
@@ -1073,7 +1073,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_petite_chambre_amis', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_petite_chambre_amis', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_petite_chambre_amis'), states('climate.radiateur_petite_chambre_amis')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_petite_chambre_amis'), states('climate.radiateur_petite_chambre_amis')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'Absent' }}
             icon: "mdi:bed-empty"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_petite_chambre_amis', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_petite_chambre_amis') in ['unknown', 'unavailable'] else '' }}"
@@ -1091,7 +1091,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_chambre_mathias', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_chambre_mathias', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_mathias'), states('climate.radiateur_chambre_mathias')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_chambre_mathias'), states('climate.radiateur_chambre_mathias')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'Absent' }}
             icon: "mdi:bed"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_chambre_mathias', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_chambre_mathias') in ['unknown', 'unavailable'] else '' }}"
@@ -1109,7 +1109,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_sdb_garcons', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_sdb_garcons', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_garcons'), states('climate.radiateur_sdb_garcons')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_garcons'), states('climate.radiateur_sdb_garcons')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'Absent' }}
             icon: "mdi:shower-head"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_garcons', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_sdb_garcons') in ['unknown', 'unavailable'] else '' }}"
@@ -1127,7 +1127,7 @@ views:
             secondary: |-
               {% set current = state_attr('climate.radiateur_sdb_julie', 'current_temperature') %}
               {% set target = state_attr('climate.radiateur_sdb_julie', 'temperature') %}
-              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_julie'), states('climate.radiateur_sdb_julie')) }}
+              {{ (current | round(1) ~ ' °C') if current is number else 'Température indisponible' }} · cible {{ (target | round(1) ~ ' °C') if target is number else '—' }} · {{ {'auto':'Auto','heat':'Chauffage','off':'Éteint'}.get(states('climate.radiateur_sdb_julie'), states('climate.radiateur_sdb_julie')) }} · {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'Absent' }}
             icon: "mdi:shower-head"
             icon_color: "{{ 'deep-orange' if state_attr('climate.radiateur_sdb_julie', 'hvac_action') == 'heating' else 'disabled' }}"
             badge_icon: "{{ 'mdi:alert-circle' if states('climate.radiateur_sdb_julie') in ['unknown', 'unavailable'] else '' }}"
@@ -1270,6 +1270,55 @@ views:
           -
             type: "custom:mushroom-title-card"
             title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_parents"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_parents"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_parents"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_parents"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_chambre_parents', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_parents', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_parents', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_parents', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
             subtitle: "COMMANDES"
             grid_options:
               columns: "full"
@@ -1387,7 +1436,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_parents', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_parents', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_parents_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_parents_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -1428,7 +1477,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -1463,7 +1512,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · Chambre parents"
+            title: "Plannings · Chambre parents"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -1475,22 +1524,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_chambre_parents"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_chambre_parents_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_chambre_parents_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_chambre_parents_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_chambre_parents', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_parents', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -2173,6 +2251,55 @@ views:
           -
             type: "custom:mushroom-title-card"
             title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_julie"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_julie"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_julie"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_julie"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_chambre_julie', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_julie', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_julie', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_julie', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
             subtitle: "COMMANDES"
             grid_options:
               columns: "full"
@@ -2290,7 +2417,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_chambre_julie', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_chambre_julie', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_chambre_julie_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_chambre_julie_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -2331,7 +2458,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -2366,7 +2493,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · Chambre Julie"
+            title: "Plannings · Chambre Julie"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -2378,22 +2505,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_chambre_julie"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_chambre_julie_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_chambre_julie_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_chambre_julie_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_chambre_julie', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_julie', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -2468,6 +2624,55 @@ views:
                 action: "none"
               card_mod:
                 style: "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_pablo"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_pablo"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_pablo"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_pablo"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -2591,7 +2796,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_chambre_pablo', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_chambre_pablo', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_chambre_pablo_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_chambre_pablo_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -2632,7 +2837,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -2667,7 +2872,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · Chambre Pablo"
+            title: "Plannings · Chambre Pablo"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -2679,22 +2884,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_chambre_pablo"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_chambre_pablo_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_chambre_pablo_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_chambre_pablo_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_pablo', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -2769,6 +3003,55 @@ views:
                 action: "none"
               card_mod:
                 style: "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_grande_chambre_amis"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_grande_chambre_amis"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_grande_chambre_amis"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_grande_chambre_amis"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -2892,7 +3175,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_grande_chambre_amis', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_grande_chambre_amis', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_grande_chambre_amis_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_grande_chambre_amis_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -2933,7 +3216,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -2968,7 +3251,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · Grande chambre amis"
+            title: "Plannings · Grande chambre amis"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -2980,22 +3263,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_grande_chambre_amis"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_grande_chambre_amis_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_grande_chambre_amis_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_grande_chambre_amis_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_grande_chambre_amis', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -3070,6 +3382,55 @@ views:
                 action: "none"
               card_mod:
                 style: "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_petite_chambre_amis"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_petite_chambre_amis"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_petite_chambre_amis"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_petite_chambre_amis"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -3193,7 +3554,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_petite_chambre_amis', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_petite_chambre_amis', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_petite_chambre_amis_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_petite_chambre_amis_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -3234,7 +3595,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -3269,7 +3630,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · Petite chambre amis"
+            title: "Plannings · Petite chambre amis"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -3281,22 +3642,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_petite_chambre_amis"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_petite_chambre_amis_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_petite_chambre_amis_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_petite_chambre_amis_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_petite_chambre_amis', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -3371,6 +3761,55 @@ views:
                 action: "none"
               card_mod:
                 style: "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_mathias"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_mathias"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_chambre_mathias"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_chambre_mathias"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -3494,7 +3933,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_chambre_mathias', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_chambre_mathias', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_chambre_mathias_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_chambre_mathias_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -3535,7 +3974,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -3570,7 +4009,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · Chambre Mathias"
+            title: "Plannings · Chambre Mathias"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -3582,22 +4021,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_chambre_mathias"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_chambre_mathias_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_chambre_mathias_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_chambre_mathias_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_chambre_mathias', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -3672,6 +4140,55 @@ views:
                 action: "none"
               card_mod:
                 style: "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_sdb_garcons"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_sdb_garcons"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_sdb_garcons"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_sdb_garcons"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -3795,7 +4312,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_sdb_garcons', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_sdb_garcons', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_sdb_garcons_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_sdb_garcons_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -3836,7 +4353,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -3871,7 +4388,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · SDB garçons"
+            title: "Plannings · SDB garçons"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -3883,22 +4400,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_sdb_garcons"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_sdb_mathias_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_sdb_mathias_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_sdb_mathias_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_garcons', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:
@@ -3973,6 +4519,55 @@ views:
                 action: "none"
               card_mod:
                 style: "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "custom:mushroom-title-card"
+            title: ""
+            subtitle: "OCCUPATION"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "grid"
+            columns: 2
+            square: false
+            cards:
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_sdb_julie"
+                name: "Présent"
+                icon: "mdi:account-check"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_on"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_sdb_julie"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 14px 0 0 14px; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(46, 125, 50)' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'var(--secondary-text-color)' }}; }"
+              -
+                type: "button"
+                entity: "input_boolean.chauffage_presence_sdb_julie"
+                name: "Absent"
+                icon: "mdi:account-off"
+                show_state: false
+                icon_height: "24px"
+                tap_action:
+                  action: "perform-action"
+                  perform_action: "input_boolean.turn_off"
+                  target:
+                    entity_id: "input_boolean.chauffage_presence_sdb_julie"
+                hold_action:
+                  action: "none"
+                card_mod:
+                  style: "ha-card { height: 76px; border-radius: 0 14px 14px 0; box-shadow: none; border: 1px solid var(--divider-color); background: {{ 'rgb(85, 99, 112)' if is_state('input_boolean.chauffage_presence_sdb_julie', 'off') else 'var(--card-background-color)' }}; color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_julie', 'off') else 'var(--primary-text-color)' }}; --state-icon-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_julie', 'off') else 'var(--secondary-text-color)' }}; --state-icon-active-color: {{ 'white' if is_state('input_boolean.chauffage_presence_sdb_julie', 'off') else 'var(--secondary-text-color)' }}; }"
+            card_mod:
+              style: "ha-card { --grid-card-gap: 0px; } :host { --grid-card-gap: 0px; }"
             grid_options:
               columns: "full"
               rows: "auto"
@@ -4096,7 +4691,7 @@ views:
               primary: "Consigne de planning : {{ state_attr('climate.radiateur_sdb_julie', 'temperature') | string | replace('.', ',') }} °C"
               secondary: |-
                 Température actuelle : {{ state_attr('climate.radiateur_sdb_julie', 'current_temperature') | string | replace('.', ',') }} °C
-                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_sdb_julie_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
+                {% set j = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'][now().weekday()] %}{% set p = states('text.radiateur_sdb_julie_weekly_schedule_' ~ j) %}{% set ns = namespace(out=[], last='') %}{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}{% endif %}{% set ns.last = t %}{% endfor %}Planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'Absent' }} : {{ ns.out | join(', ') if ns.out else 'indisponible' }}
               icon: "mdi:calendar-clock"
               icon_color: "cyan"
               multiline_secondary: true
@@ -4137,7 +4732,7 @@ views:
                 icon_color: "deep-orange"
               -
                 type: "template"
-                content: "Planning"
+                content: "Plannings"
                 icon: "mdi:calendar-clock"
                 tap_action:
                   action: "navigate"
@@ -4172,7 +4767,7 @@ views:
               rows: "auto"
           -
             type: "custom:mushroom-title-card"
-            title: "Planning · SDB Julie"
+            title: "Plannings · SDB Julie"
             subtitle: "1 à 6 changements, le premier à 00:00"
             grid_options:
               columns: "full"
@@ -4184,22 +4779,51 @@ views:
               columns: "full"
               rows: "auto"
           -
+            type: "custom:mushroom-template-card"
+            entity: "input_boolean.chauffage_presence_sdb_julie"
+            primary: "Planning actif : {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'Absent' }}"
+            secondary: "Changer d’état depuis la page de la pièce envoie l’autre planning"
+            icon: "{{ 'mdi:account-check' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'mdi:account-off' }}"
+            icon_color: "{{ 'green' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'blue-grey' }}"
+            tap_action:
+              action: "none"
+            hold_action:
+              action: "none"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
             type: "entities"
             show_header_toggle: false
+            title: "Présent"
             entities:
               -
                 entity: "input_text.chauffage_planning_sdb_julie_semaine"
-                name: "Semaine"
+                name: "Tous les jours"
+                icon: "mdi:account-check"
+            card_mod:
+              style: "ha-card { {% if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
+            grid_options:
+              columns: "full"
+              rows: "auto"
+          -
+            type: "entities"
+            show_header_toggle: false
+            title: "Absent"
+            entities:
               -
-                entity: "input_text.chauffage_planning_sdb_julie_weekend"
-                name: "Week-end"
+                entity: "input_text.chauffage_planning_sdb_julie_absent"
+                name: "Tous les jours"
+                icon: "mdi:account-off"
+            card_mod:
+              style: "ha-card { {% if not is_state('input_boolean.chauffage_presence_sdb_julie', 'on') %}border: 1px solid rgba(0, 188, 212, 0.45); border-left: 4px solid #00acc1; background: rgba(0, 188, 212, 0.07); box-shadow: none; {% endif %} }"
             grid_options:
               columns: "full"
               rows: "auto"
           -
             type: "custom:mushroom-template-card"
             primary: "Enregistrer"
-            secondary: "Copie le planning vers la vanne sans changer son mode"
+            secondary: "Envoie le planning {{ 'Présent' if is_state('input_boolean.chauffage_presence_sdb_julie', 'on') else 'Absent' }} à la vanne sans changer son mode"
             icon: "mdi:calendar-check"
             icon_color: "cyan"
             tap_action:

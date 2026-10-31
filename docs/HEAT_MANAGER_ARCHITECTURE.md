@@ -111,6 +111,8 @@ Les zones sont définies dans `ZONES` et les pièces dans `ROOMS` du générateu
 
 Pour chaque base, les interfaces attendues sont `climate.<base>`, `sensor.<base>_battery`, `text.<base>_weekly_schedule_<jour anglais>`, `number.<base>_temporary_mode_duration` et `select.<base>_temporary_mode_select`. Les helpers suivent `input_text.chauffage_planning_<slug>_<semaine|weekend>`.
 
+Présence (depuis le 2026-10-31) : les 5 chambres du 1er étage, la chambre parents, SDB Julie et SDB garçons ont un `input_boolean.chauffage_presence_<pièce>` (on = Présent) et deux plannings valables les 7 jours : Présent = `_semaine` (identifiant conservé, affiché « Présent ») et Absent = `_absent` ; leurs helpers `_weekend` sont supprimés. `chauffage_appliquer_planning_cible` choisit le planning selon la présence ; l’automatisation `chauffage_presence_planning` l’appelle à chaque passage on ↔ off (pas à la restauration au démarrage). Un planning invalide crée une notification persistante `chauffage_planning_<pièce>` (effacée au prochain envoi réussi). Interface : boutons Présent / Absent sur la page de la pièce, page « Plannings » avec le planning actif encadré, présence ajoutée aux lignes des pages de zone.
+
 Le slug historique `sdb_mathias` et le `unique_id` de synthèse `chauffage_sdb_mathias_resume` sont conservés pour la SDB garçons. Les zones ne constituent pas des cibles de scripts. Il existe néanmoins un capteur de synthèse du sous-sol dans le package.
 
 ## 5. Tableau de bord et génération

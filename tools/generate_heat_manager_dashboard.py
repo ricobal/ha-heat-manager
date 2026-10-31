@@ -181,6 +181,17 @@ ZONES = [
 ]
 
 
+# Pièces à deux plannings (un pour les 7 jours) : Présent = « _semaine », Absent = « _absent ».
+PRESENCE_ROOMS = [
+    "chambre_julie", "chambre_pablo", "grande_chambre_amis", "petite_chambre_amis",
+    "chambre_mathias", "chambre_parents", "sdb_julie", "sdb_garcons",
+]
+
+
+def presence_entity(room_key: str) -> str:
+    return f"input_boolean.chauffage_presence_{room_key}"
+
+
 def nav(path: str) -> dict[str, Any]:
     return {"action": "navigate", "navigation_path": f"{DASHBOARD}/{path}"}
 
@@ -311,7 +322,10 @@ def room_card(room_key: str) -> dict[str, Any]:
         "type": "custom:mushroom-template-card",
         "entity": entity,
         "primary": room["title"],
-        "secondary": room_secondary(entity),
+        "secondary": room_secondary(entity) + (
+            " · {{ 'Présent' if is_state('" + presence_entity(room_key) + "', 'on') else 'Absent' }}"
+            if room_key in PRESENCE_ROOMS else ""
+        ),
         "icon": room["icon"],
         "icon_color": "{{ 'deep-orange' if state_attr('" + entity + "', 'hvac_action') == 'heating' else 'disabled' }}",
         "badge_icon": "{{ 'mdi:alert-circle' if states('" + entity + "') in ['unknown', 'unavailable'] else '' }}",
@@ -472,6 +486,18 @@ def trv_mode_buttons(entity: str) -> dict[str, Any]:
         ("Manuel", "heat", "mdi:fire", "194, 75, 0"),
         ("Arrêt", "off", "mdi:power", "85, 99, 112"),
     ))
+
+
+def presence_buttons(room_key: str) -> dict[str, Any]:
+    entity = presence_entity(room_key)
+    grid = hvac_mode_buttons(entity, (
+        ("Présent", "on", "mdi:account-check", "46, 125, 50"),
+        ("Absent", "off", "mdi:account-off", "85, 99, 112"),
+    ))
+    for button, service in zip(grid["cards"], ("input_boolean.turn_on", "input_boolean.turn_off")):
+        button["tap_action"] = perform(service)
+        button["tap_action"]["target"] = {"entity_id": entity}
+    return grid
 
 
 def house_mode_buttons() -> dict[str, Any]:
@@ -663,6 +689,11 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
     room = ROOMS[room_key]
     entity = room["entity"]
     battery = f"sensor.{room['base']}_battery"
+    presence = room_key in PRESENCE_ROOMS
+    planning_label = (
+        "Planning {{ 'Présent' if is_state('" + presence_entity(room_key) + "', 'on') else 'Absent' }} : "
+        if presence else "Planning : "
+    )
     cards: list[dict[str, Any]] = [
         title_card(room["title"]),
         {
@@ -681,6 +712,7 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
                 "card_mod": {"style": "ha-card { background: rgb(21, 101, 192); border: none; box-shadow: none; --primary-text-color: white; --secondary-text-color: rgba(255, 255, 255, 0.85); --card-primary-color: white; --card-secondary-color: rgba(255, 255, 255, 0.85); }"},
             },
         },
+        *([title_card("", "OCCUPATION"), presence_buttons(room_key)] if presence else []),
         title_card("", "COMMANDES"),
         trv_mode_buttons(entity),
         # La TRVZB quitte le planning si sa consigne change en Auto : réglage réservé au mode Manuel.
@@ -727,7 +759,7 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
                     "{% for t in p.split(' ') if '/' in t %}{% if t != ns.last %}"
                     "{% set ns.out = ns.out + ['à ' ~ t.split('/')[0] ~ ' = ' ~ t.split('/')[1] ~ '°C'] %}"
                     "{% endif %}{% set ns.last = t %}{% endfor %}"
-                    "Planning : {{ ns.out | join(', ') if ns.out else 'indisponible' }}"
+                    + planning_label + "{{ ns.out | join(', ') if ns.out else 'indisponible' }}"
                 ),
                 "icon": "mdi:calendar-clock",
                 "icon_color": "cyan",
@@ -751,7 +783,7 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
             "alignment": "justify",
             "chips": [
                 action_chip("Boost", "mdi:fire", perform("script.chauffage_boost_cible", {"cible": room_key}), "deep-orange"),
-                action_chip("Planning", "mdi:calendar-clock", nav(f"chauffage-planning-piece-{room_key.replace('_', '-')}")),
+                action_chip("Plannings" if presence else "Planning", "mdi:calendar-clock", nav(f"chauffage-planning-piece-{room_key.replace('_', '-')}")),
             ],
         },
     ]
@@ -764,7 +796,59 @@ def room_view(room_key: str, zone_key: str) -> dict[str, Any]:
     )
 
 
+def presence_planning_view(title: str, path: str, target: str, planning_slug: str, parent_path: str) -> dict[str, Any]:
+    presence = presence_entity(target)
+    present = "is_state('" + presence + "', 'on')"
+
+    def block(label: str, suffix: str, icon: str, active: str) -> dict[str, Any]:
+        return {
+            "type": "entities", "show_header_toggle": False,
+            "title": label,
+            "entities": [{"entity": f"input_text.chauffage_planning_{planning_slug}_{suffix}", "name": "Tous les jours", "icon": icon}],
+            # Le planning de l'état en cours est encadré comme les cartes de consigne.
+            "card_mod": {"style": "ha-card { {% if " + active + " %}" + SETPOINT_STYLE.removeprefix("ha-card { ").removesuffix("}") + "{% endif %} }"},
+        }
+
+    cards: list[dict[str, Any]] = [
+        title_card(f"Plannings · {title}", "1 à 6 changements, le premier à 00:00"),
+        {
+            "type": "markdown",
+            "content": "Format : `HH:MM/température`, séparé par des espaces. Exemple : `00:00/17 06:30/19 22:30/17`.",
+        },
+        {
+            "type": "custom:mushroom-template-card",
+            "entity": presence,
+            "primary": "Planning actif : {{ 'Présent' if " + present + " else 'Absent' }}",
+            "secondary": "Changer d’état depuis la page de la pièce envoie l’autre planning",
+            "icon": "{{ 'mdi:account-check' if " + present + " else 'mdi:account-off' }}",
+            "icon_color": "{{ 'green' if " + present + " else 'blue-grey' }}",
+            "tap_action": {"action": "none"},
+            "hold_action": {"action": "none"},
+        },
+        block("Présent", "semaine", "mdi:account-check", present),
+        block("Absent", "absent", "mdi:account-off", "not " + present),
+        {
+            "type": "custom:mushroom-template-card",
+            "primary": "Enregistrer",
+            "secondary": "Envoie le planning {{ 'Présent' if " + present + " else 'Absent' }} à la vanne sans changer son mode",
+            "icon": "mdi:calendar-check",
+            "icon_color": "cyan",
+            "tap_action": perform("script.chauffage_appliquer_planning_cible", {"cible": target}),
+            "hold_action": {"action": "none"},
+        },
+        {
+            "type": "custom:mushroom-template-card",
+            "primary": "Retour",
+            "icon": "mdi:arrow-left",
+            "tap_action": nav(parent_path),
+        },
+    ]
+    return make_view(f"Planning {title}", path, cards, parent_path)
+
+
 def planning_view(title: str, path: str, target: str, planning_slug: str, parent_path: str) -> dict[str, Any]:
+    if target in PRESENCE_ROOMS:
+        return presence_planning_view(title, path, target, planning_slug, parent_path)
     entities = [
         {"entity": f"input_text.chauffage_planning_{planning_slug}_semaine", "name": "Semaine"},
         {"entity": f"input_text.chauffage_planning_{planning_slug}_weekend", "name": "Week-end"},
