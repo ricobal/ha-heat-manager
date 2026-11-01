@@ -135,7 +135,8 @@ PROG = ("{% set f = states('" + FIN + "') %}{% set tot = state_attr('" + FIN + "
         "{% if ok %}{% set fin = as_datetime(f) %}"
         "{% set ecs = [[tot * 60 - (fin - now()).total_seconds(), 0]|max, tot * 60]|min %}"
         "{% set r = ((tot * 60 - ecs) / 60)|round(0, 'ceil')|int %}{% set e = tot - r %}{% endif %}")
-NBSP = "\\0000a0"
+# Espace fine insécable : contrairement à U+00A0, elle n'est pas étirée par text-align-last: justify.
+NBSP = "\\00202f"
 
 
 def progress_css():
