@@ -12,6 +12,66 @@ input_number:
     unit_of_measurement: min
     icon: mdi:timer-outline
 
+# Fin de l'arrosage de la zone en cours (2026-11-01). L'Etherain ne donne ni
+# l'heure de début ni la durée : le début est l'heure du lancement manuel ou du
+# changement de zone pendant un cycle (lecture toutes les 10 s), la durée vient
+# de la fenêtre ou du réglage du cycle.
+template:
+  - triggers:
+      - trigger: event
+        event_type: etherain_zone_lancee
+        id: manuel
+      - trigger: state
+        entity_id:
+          - sensor.etherain_statut_irrigation
+          - sensor.etherain_derniere_zone_arrosee
+        id: etherain
+    actions:
+      - variables:
+          capteur: sensor.etherain_zone_en_cours_fin
+          run: "{{ is_state('sensor.etherain_statut_irrigation', 'Arrosage en cours') }}"
+          cyc: >-
+            {{ 'court' if is_state('input_boolean.etherain_cycle_court', 'on') else 'moyen'
+               if is_state('input_boolean.etherain_cycle_moyen', 'on') else 'long'
+               if is_state('input_boolean.etherain_cycle_long', 'on') else '' }}
+          cur: "{{ states('sensor.etherain_derniere_zone_arrosee') | int(0) }}"
+          p_zone: "{{ state_attr(capteur, 'zone') | int(0) }}"
+          p_mode: "{{ state_attr(capteur, 'mode') or '' }}"
+          p_debut: "{{ state_attr(capteur, 'debut') or '' }}"
+          p_duree: "{{ state_attr(capteur, 'duree') | int(0) }}"
+          # Juste après un lancement manuel, le statut lu peut encore être « Arrêté »
+          recent: "{{ p_debut != '' and (now() - as_datetime(p_debut)).total_seconds() < 30 }}"
+          # manuel : lancement depuis la fenêtre ; cycle : nouvelle zone d'un cycle ;
+          # garde : même arrosage qu'avant ; aucun : rien en cours
+          cas: >-
+            {% if trigger.id == 'manuel' %}manuel
+            {%- elif run and cyc and 1 <= cur <= 5 %}{{ 'garde' if p_mode == 'cycle' and p_zone == cur else 'cycle' }}
+            {%- elif p_mode == 'manuel' and (run or recent) %}garde
+            {%- else %}aucun{% endif %}
+          zone: >-
+            {{ trigger.event.data.zone | int if cas == 'manuel' else cur if cas == 'cycle'
+               else p_zone if cas == 'garde' else 0 }}
+          duree: >-
+            {{ trigger.event.data.duree | int if cas == 'manuel'
+               else states('input_number.etherain_temps_arrosage_cycle_' ~ cyc ~ '_zone_' ~ cur) | int(0) if cas == 'cycle'
+               else p_duree if cas == 'garde' else 0 }}
+          debut: "{{ now().isoformat() if cas in ['manuel', 'cycle'] else p_debut if cas == 'garde' else '' }}"
+          mode: "{{ cas if cas in ['manuel', 'cycle'] else p_mode if cas == 'garde' else '' }}"
+    sensor:
+      - name: Etherain zone en cours fin
+        unique_id: etherain_zone_en_cours_fin
+        default_entity_id: sensor.etherain_zone_en_cours_fin
+        device_class: timestamp
+        icon: mdi:timer-sand
+        state: >-
+          {{ (as_datetime(debut) + timedelta(minutes=duree | int)).isoformat()
+             if debut != '' and duree | int > 0 else none }}
+        attributes:
+          zone: "{{ zone | int if mode else none }}"
+          duree: "{{ duree | int if mode else none }}"
+          debut: "{{ debut if mode else none }}"
+          mode: "{{ mode if mode else none }}"
+
 rest_command:
   etherain_irrigation_zone_manuel:
     url: >-
@@ -63,6 +123,11 @@ script:
       - action: rest_command.etherain_stop_irrigation
       - action: rest_command.etherain_irrigation_zone_manuel
         data:
+          zone: "{{ zone | int }}"
+          duree: "{{ duree | int }}"
+      # Lu par sensor.etherain_zone_en_cours_fin (barre de progression de l'écran)
+      - event: etherain_zone_lancee
+        event_data:
           zone: "{{ zone | int }}"
           duree: "{{ duree | int }}"
 

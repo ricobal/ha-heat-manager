@@ -126,14 +126,42 @@ def zone_popup(z, nom):
             "left_button": "Annuler", "left_button_variant": "neutral", "left_button_appearance": "plain"}}]}}}
 
 
+# Avancement de la zone en cours, d'après sensor.etherain_zone_en_cours_fin (packages/arrosage_manuel.yaml) :
+# tot (min), ecs (secondes écoulées), e et r (minutes écoulées et restantes), fin.
+FIN = "sensor.etherain_zone_en_cours_fin"
+PROG = ("{% set f = states('" + FIN + "') %}{% set tot = state_attr('" + FIN + "','duree')|int(0) %}"
+        "{% set ok = st == 'cours' and f not in ['unknown','unavailable'] and tot > 0"
+        " and state_attr('" + FIN + "','zone')|int(0) == {z} %}"
+        "{% if ok %}{% set fin = as_datetime(f) %}"
+        "{% set ecs = [[tot * 60 - (fin - now()).total_seconds(), 0]|max, tot * 60]|min %}"
+        "{% set r = ((tot * 60 - ecs) / 60)|round(0, 'ceil')|int %}{% set e = tot - r %}{% endif %}")
+NBSP = "\\0000a0"
+
+
+def progress_css():
+    # Barre animée en CSS (délai négatif = temps déjà écoulé), légende « écoulées / restantes » en dessous.
+    return ("{% if ok %}ha-card { position: relative; }"
+            " ha-card:after { content: ''; display: block; height: 6px; margin: 0 12px 30px; border-radius: 3px;"
+            f" background-color: rgba({BLUE},0.15); background-image: linear-gradient(rgb({BLUE}), rgb({BLUE}));"
+            " background-repeat: no-repeat; background-size: 0% 100%;"
+            " animation: arrosage {{ tot * 60 }}s linear -{{ ecs|int }}s forwards; }"
+            " @keyframes arrosage { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }"
+            " ha-card:before { position: absolute; left: 12px; right: 12px; bottom: 9px; font-size: 12px;"
+            " color: var(--secondary-text-color); text-align-last: justify; content: '"
+            f"{{{{ e }}}}{NBSP}min{NBSP}écoulée{{{{ 's' if e > 1 }}}} {{{{ r }}}}{NBSP}min{NBSP}restante{{{{ 's' if r > 1 }}}}'; }}"
+            "{% endif %}")
+
+
 def zones():
     cards = [{"type": "custom:mushroom-title-card", "subtitle": "Zones"}]
     for z, nom, icon, _ in ZONES:
         d = DUR.format(z=z)
         st = PRE + f"{{% set st = 'cours' if cur == {z} else ('fait' if cyc and run and cur > {z} else ('avenir' if cyc and run else 'repos')) %}}"
+        prog = st + PROG.replace("{z}", str(z))
         cards.append(tpl_card(
             entity=f"binary_sensor.etherain_etat_zone_{z}", primary=nom,
-            secondary=st + "{% if st == 'cours' %}En cours{{ ' · ' ~ " + d + " ~ ' min' if cyc else '' }}"
+            secondary=prog + "{% if ok %}En cours · {{ tot }} min · fin vers {{ as_local(fin).strftime('%H:%M') }}"
+            "{% elif st == 'cours' %}En cours{{ ' · ' ~ " + d + " ~ ' min' if cyc else '' }}"
             "{% elif st == 'fait' %}Terminé · {{ " + d + " }} min"
             "{% elif st == 'avenir' %}À venir · {{ " + d + " }} min"
             f"{{% else %}}Zone {z}{{% endif %}}",
@@ -143,8 +171,8 @@ def zones():
             hold_action={"action": "none"},
             card_mod={"style": {
                 "mushroom-shape-icon$": st + "{% if st == 'cours' %}" + PULSE + "{% endif %}",
-                ".": st + f"{{% if st == 'cours' %}}ha-card {{ border: 2px solid rgb({BLUE}); background: rgba({BLUE},0.08); }}"
-                "{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% endif %}"}}))
+                ".": prog + f"{{% if st == 'cours' %}}ha-card {{ border: 2px solid rgb({BLUE}); background: rgba({BLUE},0.08); }}"
+                "{% elif st == 'fait' %}ha-card { opacity: 0.75; }{% endif %}" + progress_css()}}))
     return cards
 
 
